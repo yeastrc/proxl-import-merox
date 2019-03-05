@@ -1,0 +1,6 @@
+Starting up StavroX 3 to proxl XML Converter (version #VERSION#)
+
+Please report problems by submitting issues on GitHub at:
+https://github.com/yeastrc/proxl-import-stavrox
+Or by email to Michael Riffle <mriffle@uw.edu>
+
