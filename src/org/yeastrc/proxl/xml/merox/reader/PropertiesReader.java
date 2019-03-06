@@ -17,7 +17,7 @@ import org.yeastrc.proxl.xml.merox.mods.MeroxVariableModification;
 public class PropertiesReader {
 
 	private static final int NONE				 = -1;
-	private static final int SETTINGS	 		 = 0;
+	private static final int SETTINGS            = 0;
 	private static final int ELEMENTS	 		 = 1;
 	private static final int IONTYPES	 		 = 2;
 	private static final int AMINOACIDS 		 = 3;
@@ -47,10 +47,24 @@ public class PropertiesReader {
 			br = new BufferedReader(new InputStreamReader(is, "ISO-8859-1"));
 			
 			String currentLine;		// the line we're currently parsing
-			int mode = SETTINGS;
+			int mode = NONE;
 			while( ( currentLine = br.readLine() ) != null ) {
-				
+
+				System.out.println( "reading line: " + currentLine );
+
+				currentLine = removeComment( currentLine );
+
+				System.out.println( "removed comment: " + currentLine );
+
+
+
 				if( currentLine.equals( "END" ) ) {
+
+					if( mode == ELEMENTS ) {
+						mode = SETTINGS;
+						continue;
+					}
+
 					mode = NONE;
 					continue;
 				}
@@ -58,17 +72,17 @@ public class PropertiesReader {
 				
 				// find the new mode
 				if( mode == NONE ) {
-					if( currentLine.equals( "ELEMENTS" ) )
+					if( currentLine.startsWith( "ELEMENTS" ) )
 						mode = ELEMENTS;
-					else if( currentLine.equals( "IONTYPES" ) )
+					else if( currentLine.startsWith( "IONTYPES" ) )
 						mode = IONTYPES;
-					else if( currentLine.equals( "AMINOACIDS" ) )
+					else if( currentLine.startsWith( "AMINOACIDS" ) )
 						mode = AMINOACIDS;
-					else if( currentLine.equals( "PROTEASE" ) )
+					else if( currentLine.startsWith( "PROTEASE" ) )
 						mode = PROTEASE;
-					else if( currentLine.equals( "VARMODIFICATION" ) )
+					else if( currentLine.startsWith( "VARMODIFICATION" ) )
 						mode = VARMODIFICATION;
-					else if( currentLine.equals( "STATMODIFICATION" ) )
+					else if( currentLine.startsWith( "STATMODIFICATION" ) )
 						mode = STATMODIFICATION;
 					
 					// special case, section header includes data
@@ -78,7 +92,7 @@ public class PropertiesReader {
 						ap.setCrosslinkerIndex( Integer.parseInt( fields[ 1 ] ) );						
 					}
 					
-					else if( currentLine.equals( "REPORTERIONS" ) )
+					else if( currentLine.startsWith( "REPORTERIONS" ) )
 						mode = REPORTERIONS;
 					
 					else {
@@ -100,8 +114,14 @@ public class PropertiesReader {
 				else if( mode == SETTINGS ) {
 					
 					// for some reason, the settings at the beginning of this file do not have a header line or an END line
-					if( currentLine.equals( "ELEMENTS" ) ) {
+					if( currentLine.startsWith( "ELEMENTS" ) ) {
 						mode = ELEMENTS;
+						continue;
+					}
+
+					// for some reason, the settings at the beginning of this file do not have a header line or an END line
+					if( currentLine.startsWith( "IONTYPES" ) ) {
+						mode = IONTYPES;
 						continue;
 					}
 					
@@ -190,5 +210,10 @@ public class PropertiesReader {
 		
 		return ap;
 	}
-	
+
+	private static String removeComment( String line ) {
+		return line.replaceAll( "\\/\\/.+", "" ).trim();
+
+	}
+
 }

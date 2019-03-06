@@ -1,5 +1,6 @@
 package org.yeastrc.proxl.xml.merox.reader;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -42,7 +43,16 @@ public class MeroxCrosslinker {
 		this.bindingRules = bindingRules;
 	}
 
+	public Collection<String> getCleavedFormulae() {
+		return cleavedFormulae;
+	}
+
+	public void setCleavedFormulae(Collection<String> cleavedFormulae) {
+		this.cleavedFormulae = cleavedFormulae;
+	}
+
 	private String name;
 	private String formula;
+	private Collection<String> cleavedFormulae;
 	private List<String> bindingRules;	
 }
