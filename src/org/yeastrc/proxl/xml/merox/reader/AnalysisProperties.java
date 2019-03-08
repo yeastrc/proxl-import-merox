@@ -17,10 +17,7 @@ import org.yeastrc.proxl.xml.merox.mods.MeroxVariableModification;
  */
 public class AnalysisProperties {
 	
-	public MeroxCrosslinker getCrosslinker() {
-		return this.crosslinkers.get( this.getCrosslinkerIndex() );
-	}
-	
+
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString( this );
@@ -77,21 +74,20 @@ public class AnalysisProperties {
 		this.crosslinkerIndex = crosslinkerIndex;
 	}
 
-	public List<MeroxCrosslinker> getCrosslinkers() {
-		return crosslinkers;
+	public MeroxCrosslinker getCrosslinker() {
+		return crosslinker;
 	}
 
-	public void setCrosslinkers(List<MeroxCrosslinker> crosslinkers) {
-		this.crosslinkers = crosslinkers;
+	public void setCrosslinker(MeroxCrosslinker crosslinker) {
+		this.crosslinker = crosslinker;
 	}
-
 
 	private Map<String, String> analysisSettings;					// keyed by the setting name
 	private Map<String, Double> elements;							// keyed by the letter code of the element
 	private Map<String, String> ionTypes;							// keyed by the first field of the ion type line
 	private Map<String, MeroxAminoAcid> aminoAcids;				// keyed by the letter code of the amino acid
 	private int crosslinkerIndex;
-	private List<MeroxCrosslinker> crosslinkers;
+	private MeroxCrosslinker crosslinker;
 	private Collection<MeroxProteaseLine> proteaseLines;
 	private Map<String, MeroxVariableModification> variableMods;	// keyed by the "to" letter for the modification
 	private Map<String, MeroxStaticModification> staticMods;		// keyed by the "to" letter for the modification

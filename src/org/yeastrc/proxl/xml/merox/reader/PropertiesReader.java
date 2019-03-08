@@ -3,8 +3,12 @@ package org.yeastrc.proxl.xml.merox.reader;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.yeastrc.proxl.xml.merox.mods.MeroxStaticModification;
 import org.yeastrc.proxl.xml.merox.mods.MeroxVariableModification;
@@ -27,7 +31,218 @@ public class PropertiesReader {
 	private static final int STATMODIFICATION	 = 7;	
 	private static final int UNKNOWN			 = 8;
 	private static final int REPORTERIONS		 = 9;
-	
+
+	/**
+	 * Get the cross-linker for this experiment as defined in the properties file
+	 *
+	 * @param is
+	 * @return
+	 * @throws Exception
+	 */
+	public MeroxCrosslinker getCrosslinkerFromProperties( InputStream is ) throws Exception {
+
+		String linkerName = this.getCrosslinkerNameFromProperties( is );
+		return this.getCrosslinkerForNameFromProperties( is, linkerName );
+
+	}
+
+	/**
+	 * Get the Merox name for the crosslinker used in this experiment which can
+	 * then be used to determine cross-linker properties as defined in the
+	 * properties file.
+	 *
+	 * Syntax:
+	 * USEDCROSSLINKER=DSSO				//Cross-linker that is selected from the following list.
+	 *
+	 * @param is
+	 * @return
+	 * @throws Exception
+	 */
+	public String getCrosslinkerNameFromProperties( InputStream is ) throws Exception {
+
+		Pattern p = Pattern.compile( "USEDCROSSLINKER=(.+)$" );
+
+		BufferedReader br = null;
+		try {
+
+			br = new BufferedReader(new InputStreamReader(is, "ISO-8859-1"));
+
+			String currentLine;        // the line we're currently parsing
+			while ((currentLine = br.readLine()) != null) {
+
+				// remove comment and trim
+				currentLine = removeComment( currentLine );
+
+				Matcher m = p.matcher( currentLine );
+				if( m.matches() ) {
+					return m.group(1);
+				}
+			}
+
+		} finally {
+			br.close();
+		}
+
+		throw new Exception( "Unable to determine cross-linker from Merox properties." );
+	}
+
+	/**
+	 * Get a cross-linker object populated with the properties of the supplied cross-linker as
+	 * defined in the properties file.
+	 *
+	 * Syntax:
+	 *         CROSSLINKER=DSBU
+	 *         COMPOSITION=C9O3N2H12
+	 *         COMPHEAVY=
+	 *         SITE1=K{
+	 *         SITE2=KSTY{
+	 *         MAXIMUMDISTANCE=26.9
+	 *         CNL=C4H7NO
+	 *         DEADENDMOLECULE=H2O
+	 *         REPORTERIONS
+	 *         RBu;C9N2OH17
+	 *         RBuUr;C10N2O2H15
+	 *         MODSITE1
+	 *         Bu;C4NOH7;1
+	 *         BuUr;C5O2NH5;1
+	 *         Pep;;0
+	 *         MODSITE2
+	 *         Bu;C4NOH7;1
+	 *         BuUr;C5O2NH5;1
+	 *         Pep;;0
+	 *         END
+	 *
+	 * @param is
+	 * @param name
+	 * @return
+	 * @throws Exception
+	 */
+	public MeroxCrosslinker getCrosslinkerForNameFromProperties( InputStream is, String name ) throws Exception {
+
+		Pattern p = Pattern.compile( "CROSSLINKER=(.+)$" );
+		ArrayList<String> linkerDefinitionLines = new ArrayList<>(25 );
+		boolean readingLinkerDefinition = false;
+
+		BufferedReader br = null;
+		try {
+
+			br = new BufferedReader(new InputStreamReader(is, "ISO-8859-1"));
+
+			String currentLine;        // the line we're currently parsing
+			while ((currentLine = br.readLine()) != null) {
+
+				// remove comment and trim
+				currentLine = removeComment( currentLine );
+
+				Matcher m = p.matcher( currentLine );
+				if( m.matches() ) {
+
+					if( m.group( 1 ).equals( name ) ) {
+						 linkerDefinitionLines.add( currentLine );
+						 readingLinkerDefinition = true;
+						 continue;
+					}
+				}
+
+				else if( readingLinkerDefinition ) {
+
+					if( currentLine.equals( "END" ) ) {
+
+						return getCrosslinkerFromStringArray( linkerDefinitionLines );
+					} else {
+
+						linkerDefinitionLines.add( currentLine );
+					}
+				}
+
+			}
+
+		} finally {
+			br.close();
+		}
+
+		throw new Exception( "Unable to find cross-linker definition for linker: " + name );
+	}
+
+	/**
+	 * Get the crosslinker defined by the supplied array of lines from the properties file
+	 *
+	 * Syntax:
+	 *         CROSSLINKER=DSBU
+	 *         COMPOSITION=C9O3N2H12
+	 *         COMPHEAVY=
+	 *         SITE1=K{
+	 *         SITE2=KSTY{
+	 *         MAXIMUMDISTANCE=26.9
+	 *         CNL=C4H7NO
+	 *         DEADENDMOLECULE=H2O
+	 *         REPORTERIONS
+	 *         RBu;C9N2OH17
+	 *         RBuUr;C10N2O2H15
+	 *         MODSITE1
+	 *         Bu;C4NOH7;1
+	 *         BuUr;C5O2NH5;1
+	 *         Pep;;0
+	 *         MODSITE2
+	 *         Bu;C4NOH7;1
+	 *         BuUr;C5O2NH5;1
+	 *         Pep;;0
+	 *         END
+	 *
+	 * @param linkerDefinitionLines
+	 * @return
+	 */
+	public MeroxCrosslinker getCrosslinkerFromStringArray( ArrayList<String> linkerDefinitionLines ) throws Exception {
+
+		MeroxCrosslinker crosslinker = new MeroxCrosslinker();
+		crosslinker.setCleavedFormulae( new HashSet<>() );
+		crosslinker.setBindingRules( new ArrayList<>() );
+
+		boolean readingModSite = false;
+
+		for( String line : linkerDefinitionLines ) {
+
+			if( line.equals( "MODSITE1" ) ) {
+				readingModSite = true;
+			} else if( line.equals( "MODSITE2" ) ) {
+				readingModSite = true;
+			} else if( readingModSite ) {
+
+				if( line.equals( "END" ) ) {
+					readingModSite = false;
+				} else {
+
+					String[] subFields = line.split(";");
+
+					if (subFields.length != 3) {
+						throw new Exception("Unexpected syntax for MODSITE defiition. Got " + subFields);
+					}
+
+					// only include non empty formulae
+					if (subFields[1].length() > 0) {
+						crosslinker.getCleavedFormulae().add(subFields[1]);
+					}
+				}
+			} else {
+
+				String[] fields = line.split("=");
+
+				if (fields[0].equals("CROSSLINKER")) {
+					crosslinker.setName(fields[1]);
+				} else if (fields[0].equals("COMPOSITION")) {
+					crosslinker.setFormula(fields[1]);
+				} else if (fields[0].equals("SITE1")) {
+					crosslinker.getBindingRules().add(fields[1]);
+				} else if (fields[0].equals("SITE2")) {
+					crosslinker.getBindingRules().add(fields[1]);
+				}
+			}
+		}
+
+		return crosslinker;
+	}
+
+
 	public AnalysisProperties getAnalysisProperties( InputStream is ) throws Exception {
 
 		AnalysisProperties ap = new AnalysisProperties();
@@ -39,7 +254,9 @@ public class PropertiesReader {
 		ap.setProteaseLines( new ArrayList<MeroxProteaseLine>() );
 		ap.setStaticMods( new HashMap<String, MeroxStaticModification>() );
 		ap.setVariableMods( new HashMap<String, MeroxVariableModification>() );
-		ap.setCrosslinkers( new ArrayList<MeroxCrosslinker>() );
+
+		// separately get the cross-linker defiition
+		ap.setCrosslinker( getCrosslinkerFromProperties( is ) );
 		
 		BufferedReader br = null;
 		try {
@@ -88,8 +305,6 @@ public class PropertiesReader {
 					// special case, section header includes data
 					else if( currentLine.startsWith( "CROSSLINKER=" ) ) {
 						mode = CROSSLINKER;
-						String fields[] = currentLine.split( "=" );
-						ap.setCrosslinkerIndex( Integer.parseInt( fields[ 1 ] ) );						
 					}
 					
 					else if( currentLine.startsWith( "REPORTERIONS" ) )
@@ -149,19 +364,7 @@ public class PropertiesReader {
 				
 				
 				else if( mode == CROSSLINKER ) {
-					String fields[] = currentLine.split( ";" );
-					
-					MeroxCrosslinker xlinker = new MeroxCrosslinker();
-					xlinker.setName( fields[ 0 ] );
-					xlinker.setFormula( fields[ 1 ] );
-					
-					xlinker.setBindingRules( new ArrayList<String>( 2 ) );
-					
-					for( int i = 2; i < fields.length; i++ ) {
-						xlinker.getBindingRules().add( fields[ i ] );
-					}
-					
-					ap.getCrosslinkers().add( xlinker );
+
 				}
 				
 				else if( mode == PROTEASE ) {
