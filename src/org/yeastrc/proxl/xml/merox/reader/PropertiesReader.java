@@ -195,8 +195,8 @@ public class PropertiesReader {
 	public MeroxCrosslinker getCrosslinkerFromStringArray( ArrayList<String> linkerDefinitionLines ) throws Exception {
 
 		MeroxCrosslinker crosslinker = new MeroxCrosslinker();
-		crosslinker.setCleavedFormulae( new HashSet<>() );
-		crosslinker.setBindingRules( new ArrayList<>() );
+		crosslinker.setCleavedFormulae( new HashSet<String>() );
+		crosslinker.setBindingRules( new ArrayList<String>() );
 
 		boolean readingModSite = false;
 
