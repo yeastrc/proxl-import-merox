@@ -1,0 +1,55 @@
+/*
+    Build executable jar file with gradle shadowJar
+    More info at: https://imperceptiblethoughts.com/shadow/
+    
+    Requires Gradle 5+
+ */
+
+plugins {
+    id 'com.github.johnrengelman.shadow' version '5.0.0'
+}
+
+apply plugin: 'java'
+apply plugin: 'com.github.johnrengelman.shadow'
+
+repositories {
+    mavenCentral()
+
+    maven {
+        url 'https://raw.github.com/yeastrc/proxl-import-api/repository/'
+    }
+
+    maven {
+        url 'https://raw.github.com/yeastrc/java-fasta-utils/repository/'
+    }
+}
+
+dependencies {
+    compile 'info.picocli:picocli:4.0.0-alpha-1'
+    compile 'org.apache.commons:commons-lang3:3.4'
+    compile 'commons-io:commons-io:2.6'
+    compile 'org.yeastrc:proxl-import-api:1.9.1'
+    compile 'org.yeastrc:yrc-fasta-utils:2.0.2'
+    testCompile group: 'org.hamcrest', name: 'hamcrest-core', version: '1.3'
+    testCompile group: 'junit', name: 'junit-dep', version: '4.10'
+    testCompile group: 'org.hamcrest', name: 'hamcrest-library', version: '1.3'
+    compile fileTree(dir: 'lib', include: ['*.jar'])
+}
+
+processResources {
+    from ('src/main/java') {
+        include '**/*.txt'
+    }
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'org.yeastrc.proxl.xml.merox.main.MainProgram'
+    }
+}
+
+shadowJar {
+    baseName = 'merox2ProxlXML'
+    classifier = null
+    version = null
+}
