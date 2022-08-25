@@ -22,6 +22,15 @@ repositories {
     maven {
         url 'https://raw.github.com/yeastrc/java-fasta-utils/repository/'
     }
+
+    maven {
+        url 'https://raw.github.com/yeastrc/fasta-taxonomy-lookup-utils/repository/'
+    }
+
+    maven {
+        url 'https://raw.github.com/yeastrc/proteomics-utils/repository/'
+    }
+
 }
 
 dependencies {
@@ -30,10 +39,18 @@ dependencies {
     compile 'commons-io:commons-io:2.6'
     compile 'org.yeastrc:proxl-import-api:1.9.1'
     compile 'org.yeastrc:yrc-fasta-utils:2.0.2'
+    compile 'org.yeastrc:yrc-fasta-taxonomy-lookup-utils:1.0.1'
+    compile 'org.yeastrc:proteomics-utils:1.0.3'
     testCompile group: 'org.hamcrest', name: 'hamcrest-core', version: '1.3'
     testCompile group: 'junit', name: 'junit-dep', version: '4.10'
     testCompile group: 'org.hamcrest', name: 'hamcrest-library', version: '1.3'
     compile fileTree(dir: 'lib', include: ['*.jar'])
+
+    // JAXB dependencies (Required for Java 11+)
+    // https://mvnrepository.com/artifact/jakarta.xml.bind/jakarta.xml.bind-api
+    implementation group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '2.3.2'
+    // https://mvnrepository.com/artifact/org.glassfish.jaxb/jaxb-runtime
+    implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '2.3.2'
 }
 
 processResources {

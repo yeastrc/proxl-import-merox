@@ -5,6 +5,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.yeastrc.proteomics.peptide.peptide.Peptide;
+import org.yeastrc.proteomics.peptide.peptide.PeptideMassCalculator;
 import org.yeastrc.proxl.xml.merox.mods.IMeroxModification;
 import org.yeastrc.proxl.xml.merox.parsed.ParsedPeptideModification;
 import org.yeastrc.proxl.xml.merox.reader.AnalysisProperties;
@@ -97,8 +98,8 @@ public class MassUtils {
 	public static double calculateNeutralMassOfPeptide( String sequence, Collection<ParsedPeptideModification> mods ) throws Exception {
 		
 		Peptide peptide = new Peptide( sequence );
-		double mass = peptide.getMass( org.yeastrc.proteomics.mass.MassUtils.MASS_TYPE_MONOISOTOPIC );
-		
+		double mass = PeptideMassCalculator.getInstance().getMassForPeptide(peptide, org.yeastrc.proteomics.mass.MassUtils.MassType.MONOISOTOPIC);
+
 		if( mods != null ) {
 			for( ParsedPeptideModification mod : mods ) {
 				mass += mod.getMass();

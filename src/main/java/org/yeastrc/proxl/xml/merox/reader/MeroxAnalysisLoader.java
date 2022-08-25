@@ -10,7 +10,7 @@ import org.apache.commons.io.IOUtils;
 import org.yeastrc.proxl.xml.merox.constants.MeroxConstants;
 
 /**
- * Interact with the zipped StavroX analysis file to load the data
+ * Interact with the zipped MeroX analysis file to load the data
  * from the experiment into a MeroxAnalysis object
  * 
  * @author mriffle
@@ -18,7 +18,7 @@ import org.yeastrc.proxl.xml.merox.constants.MeroxConstants;
  */
 public class MeroxAnalysisLoader {
 
-	public MeroxAnalysis loadStavroxAnalysis(File dataFile ) throws Exception {
+	public MeroxAnalysis loadMeroXAnalysis(File dataFile ) throws Exception {
 		MeroxAnalysis sa = new MeroxAnalysis();
 		
 		ZipFile zipFile = null;	

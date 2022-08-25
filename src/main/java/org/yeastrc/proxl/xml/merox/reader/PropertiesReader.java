@@ -14,7 +14,7 @@ import org.yeastrc.proxl.xml.merox.mods.MeroxStaticModification;
 import org.yeastrc.proxl.xml.merox.mods.MeroxVariableModification;
 
 /**
- * Read the properties out of a properties file in the results file of a StavroX analysis
+ * Read the properties out of a properties file in the results file of a MeroX analysis
  * @author mriffle
  *
  */

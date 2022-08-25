@@ -58,16 +58,16 @@ import org.yeastrc.proxl_import.api.xml_dto.VisiblePsmAnnotations;
 import org.yeastrc.proxl_import.create_import_file_from_java_objects.main.CreateImportFileFromJavaObjectsMain;
 
 /**
- * Take the results of a StavroX analysis and build the ProXL XML
+ * Take the results of a MeroX analysis and build the ProXL XML
  * @author mriffle
  *
  */
 public class XMLBuilder {
 
-	public void buildAndSaveXML(MeroxAnalysis analysis, String linkerName, String fastaFilePath, String scanFilename, int scanNumberAdjustment, File outputFile, BigDecimal importCutoff ) throws Exception {
+	public void buildAndSaveXML(MeroxAnalysis analysis, String linkerName, File fastaFile, String scanFilename, int scanNumberAdjustment, File outputFile) throws Exception {
 		
 		ProxlInput proxlInputRoot = new ProxlInput();
-		proxlInputRoot.setFastaFilename( ( new File( fastaFilePath ) ).getName() );
+		proxlInputRoot.setFastaFilename(fastaFile.getName());
 		
 		SearchProgramInfo searchProgramInfo = new SearchProgramInfo();
 		proxlInputRoot.setSearchProgramInfo( searchProgramInfo );
@@ -84,7 +84,7 @@ public class XMLBuilder {
 		
 		
 		//
-		// Define the annotation types present in StavroX data
+		// Define the annotation types present in MeroX data
 		//
 		PsmAnnotationTypes psmAnnotationTypes = new PsmAnnotationTypes();
 		searchProgram.setPsmAnnotationTypes( psmAnnotationTypes );
@@ -96,26 +96,6 @@ public class XMLBuilder {
 		DescriptivePsmAnnotationTypes descriptivePsmAnnotationTypes = new DescriptivePsmAnnotationTypes();
 		psmAnnotationTypes.setDescriptivePsmAnnotationTypes( descriptivePsmAnnotationTypes );
 		descriptivePsmAnnotationTypes.getDescriptivePsmAnnotationType().addAll( PSMAnnotationTypes.getDescriptivePsmAnnotationTypes() );
-
-		
-		/*
-		 * Define the default import cutoffs
-		 */
-		if( importCutoff != null  && importCutoff.floatValue() < 1.0 ) {
-			AnnotationCutoffsOnImport annotationCutoffsOnImport = new AnnotationCutoffsOnImport();
-			searchProgramInfo.setAnnotationCutoffsOnImport( annotationCutoffsOnImport );
-			
-			PsmAnnotationCutoffsOnImport psmAnnotationCutoffsOnImport = new PsmAnnotationCutoffsOnImport();
-			annotationCutoffsOnImport.setPsmAnnotationCutoffsOnImport( psmAnnotationCutoffsOnImport );
-			
-			SearchAnnotationCutoff searchAnnotationCutoff = new SearchAnnotationCutoff();
-			searchAnnotationCutoff.setAnnotationName( PSMAnnotationTypes.ANNOTATION_TYPE_FDR );
-			searchAnnotationCutoff.setSearchProgram( MeroxConstants.SEARCH_PROGRAM_NAME );
-			searchAnnotationCutoff.setCutoffValue( importCutoff );
-			
-			psmAnnotationCutoffsOnImport.getSearchAnnotationCutoff().add( searchAnnotationCutoff );
-		}
-		
 		
 		//
 		// Define which annotation types are visible by default
@@ -164,11 +144,11 @@ public class XMLBuilder {
 			
 			for( String smodsTo : analysis.getAnalysisProperties().getStaticMods().keySet() ) {
 				
-				MeroxStaticModification stavroxSmod = analysis.getAnalysisProperties().getStaticMods().get( smodsTo );
+				MeroxStaticModification MeroXSmod = analysis.getAnalysisProperties().getStaticMods().get( smodsTo );
 				StaticModification xmlSmod = new StaticModification();
 				
-				xmlSmod.setAminoAcid( stavroxSmod.getFrom() );
-				xmlSmod.setMassChange( NumberUtils.getRoundedBigDecimal( stavroxSmod.getMassShift( analysis.getAnalysisProperties() ) ) );			
+				xmlSmod.setAminoAcid( MeroXSmod.getFrom() );
+				xmlSmod.setMassChange( NumberUtils.getRoundedBigDecimal( MeroXSmod.getMassShift( analysis.getAnalysisProperties() ) ) );			
 				
 				smods.getStaticModification().add( xmlSmod );
 			}	
@@ -403,7 +383,7 @@ public class XMLBuilder {
 		}
 		
 		// add in matched proteins
-		MatchedProteinsBuilder.getInstance().buildMatchedProteins( proxlInputRoot, new File( fastaFilePath ), decoyLabels );
+		MatchedProteinsBuilder.getInstance().buildMatchedProteins( proxlInputRoot, fastaFile, decoyLabels );
 		
 		
 		// add in config file

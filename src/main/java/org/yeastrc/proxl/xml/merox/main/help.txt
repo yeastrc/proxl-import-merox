@@ -1,17 +1,17 @@
-Usage: java -jar stavrox2ProxlXML.jar -r /path/to/results.file -l linker -f FASTA file full path [-s scan file name] -o /path/to/output.proxl.xml
+Usage: java -jar MeroX2ProxlXML.jar -r /path/to/results.file -l linker -f FASTA file full path [-s scan file name] -o /path/to/output.proxl.xml
 
-E.g.: java -jar stavrox2ProxlXML.jar -r ./results.zhrs -l dss -f /path/to/yeast2016.fa -s mydata.mzML -o ./output.proxl.xml
-      java -jar stavrox2ProxlXML.jar -r ./results.zhrs -l dss -f /path/to/yeast2016.fa -o ./output.proxl.xml
-      java -jar stavrox2ProxlXML.jar -r ./results.zhrs -l dss -f FASTA /path/to/yeast2016.fa -a 1 -s mydata.mzML -o ./output.proxl.xml
+E.g.: java -jar MeroX2ProxlXML.jar -r ./results.zhrs -l dss -f /path/to/yeast2016.fa -s mydata.mzML -o ./output.proxl.xml
+      java -jar MeroX2ProxlXML.jar -r ./results.zhrs -l dss -f /path/to/yeast2016.fa -o ./output.proxl.xml
+      java -jar MeroX2ProxlXML.jar -r ./results.zhrs -l dss -f FASTA /path/to/yeast2016.fa -a 1 -s mydata.mzML -o ./output.proxl.xml
 
 
 Required parameters:
 
     -r </path/to/results.zhrs> -- The full path to the results file from the
-                                  StavroX analysis.
+                                  MeroX analysis.
     
     -f </path/to/fasta.fa> -- The full path to the FASTA file used in the
-                              StavroX analysis.
+                              MeroX analysis.
     
     -l <name of cross-linker> -- The name of the cross-linker used. See
                                  below for a list of valid linkers.
@@ -28,7 +28,7 @@ Optional parameters:
 
 	-a <scan number adjustment> -- Adjust the reported scan number by this amount.
 
-	As of this writing, StavroX 3 has a bug in the parsing of mzML files that
+	As of this writing, MeroX 3 has a bug in the parsing of mzML files that
 	causes incorrect scan numbers to be reported. It uses the spectrum index
 	instead of the scan number of the spectrum at that index. This causes
 	a mismatch when the ProXL XML importer attempts to find the referenced

@@ -43,43 +43,43 @@ public class ParsedPeptideUtils {
 	}
 	
 	
-	private static ParsedPeptide getMonolinkedParsedPeptide( String stavroxPeptide, String stavroxPosition, Result result, AnalysisProperties properties ) throws Exception {
+	private static ParsedPeptide getMonolinkedParsedPeptide( String MeroXPeptide, String MeroXPosition, Result result, AnalysisProperties properties ) throws Exception {
 		String nakedPeptide = "";
 		Collection<ParsedPeptideModification> mods = new ArrayList<ParsedPeptideModification>();
 
 		double staticModTotal = 0.0;	// total static mod mass added
 		
 		// merox peptide all being with either { or [ and end with } or ]. Remove the first and last characters
-		stavroxPeptide = stavroxPeptide.substring(1, stavroxPeptide.length() - 1);
+		MeroXPeptide = MeroXPeptide.substring(1, MeroXPeptide.length() - 1);
 		
 		
-		for (int i = 0; i < stavroxPeptide.length(); i++){
-		    String stavroxResidue = String.valueOf( stavroxPeptide.charAt(i) );
+		for (int i = 0; i < MeroXPeptide.length(); i++){
+		    String MeroXResidue = String.valueOf( MeroXPeptide.charAt(i) );
 		    int peptidePosition = i + 1;
 
 		    // is this a static mod?
-		    if( properties.getStaticMods().containsKey( stavroxResidue ) ) {
-		    	nakedPeptide += properties.getStaticMods().get( stavroxResidue ).getFrom();		// use the unmodded code for this residue
+		    if( properties.getStaticMods().containsKey( MeroXResidue ) ) {
+		    	nakedPeptide += properties.getStaticMods().get( MeroXResidue ).getFrom();		// use the unmodded code for this residue
 		    	
 		    	// add to our static mod mass adjustment for later
-		    	staticModTotal += MassUtils.getMassForModification( properties.getStaticMods().get( stavroxResidue ), properties );
+		    	staticModTotal += MassUtils.getMassForModification( properties.getStaticMods().get( MeroXResidue ), properties );
 		    }
 		    
 		    // is this a variable mod?
-		    else if( properties.getVariableMods().containsKey( stavroxResidue ) ) {
-		    	nakedPeptide += properties.getVariableMods().get( stavroxResidue ).getFrom();		// use the unmodded code for this residue
+		    else if( properties.getVariableMods().containsKey( MeroXResidue ) ) {
+		    	nakedPeptide += properties.getVariableMods().get( MeroXResidue ).getFrom();		// use the unmodded code for this residue
 		    	
 		    	// add this mod to the collection of mods for this peptide
 		    	ParsedPeptideModification mod = new ParsedPeptideModification();
 		    	mod.setPosition( peptidePosition );
-		    	mod.setMass( properties.getVariableMods().get( stavroxResidue ).getMassShift( properties ) );
+		    	mod.setMass( properties.getVariableMods().get( MeroXResidue ).getMassShift( properties ) );
 		    	
 		    	mods.add( mod );
 		    }
 		    
 		    // neither a variable or a static mod
 		    else {
-		    	nakedPeptide += stavroxResidue;
+		    	nakedPeptide += MeroXResidue;
 		    }
 		    
 		}
@@ -88,18 +88,18 @@ public class ParsedPeptideUtils {
 		double massPreMonolink = MassUtils.calculateNeutralMassOfPeptide( nakedPeptide, mods );		
 		massPreMonolink += staticModTotal;
 		
-		double stavroxCalculatedMass = result.getCandidateMass();
+		double MeroXCalculatedMass = result.getCandidateMass();
 
 		// merox reports MH+ mass
-		stavroxCalculatedMass -= AtomUtils.ATOM_HYDROGEN.getMass( org.yeastrc.proteomics.mass.MassUtils.MASS_TYPE_MONOISOTOPIC );
+		MeroXCalculatedMass -= AtomUtils.ATOM_HYDROGEN.getMass( org.yeastrc.proteomics.mass.MassUtils.MassType.MONOISOTOPIC );
 		
-		double massOfMonolink = stavroxCalculatedMass - massPreMonolink;
+		double massOfMonolink = MeroXCalculatedMass - massPreMonolink;
 		BigDecimal roundedMassOfMonolink = new BigDecimal( massOfMonolink );
 		roundedMassOfMonolink = roundedMassOfMonolink.setScale( 4, RoundingMode.HALF_UP );
 		
 		// handle the monolinked position as a variable mod
-		stavroxPosition = stavroxPosition.substring( 1 );
-		int position = Integer.parseInt( stavroxPosition );
+		MeroXPosition = MeroXPosition.substring( 1 );
+		int position = Integer.parseInt( MeroXPosition );
 		if( position == 0 ) { position = 1; }
 		
 		ParsedPeptideModification mod = new ParsedPeptideModification();
@@ -120,49 +120,49 @@ public class ParsedPeptideUtils {
 	}
 	
 	
-	private static ParsedPeptide getLooplinkedParsedPeptide( String stavroxPeptide, String stavroxPosition1, String stavroxPosition2, AnalysisProperties properties ) throws Exception {
+	private static ParsedPeptide getLooplinkedParsedPeptide( String MeroXPeptide, String MeroXPosition1, String MeroXPosition2, AnalysisProperties properties ) throws Exception {
 		String nakedPeptide = "";
 		Collection<ParsedPeptideModification> mods = new ArrayList<ParsedPeptideModification>();
 		
 		// merox peptide all being with either { or [ and end with } or ]. Remove the first and last characters
-		stavroxPeptide = stavroxPeptide.substring(1, stavroxPeptide.length() - 1);
+		MeroXPeptide = MeroXPeptide.substring(1, MeroXPeptide.length() - 1);
 		
 		
-		for (int i = 0; i < stavroxPeptide.length(); i++){
-		    String stavroxResidue = String.valueOf( stavroxPeptide.charAt(i) );
+		for (int i = 0; i < MeroXPeptide.length(); i++){
+		    String MeroXResidue = String.valueOf( MeroXPeptide.charAt(i) );
 		    int peptidePosition = i + 1;
 
 		    // is this a static mod?
-		    if( properties.getStaticMods().containsKey( stavroxResidue ) ) {
-		    	nakedPeptide += properties.getStaticMods().get( stavroxResidue ).getFrom();		// use the unmodded code for this residue
+		    if( properties.getStaticMods().containsKey( MeroXResidue ) ) {
+		    	nakedPeptide += properties.getStaticMods().get( MeroXResidue ).getFrom();		// use the unmodded code for this residue
 		    }
 		    
 		    // is this a variable mod?
-		    else if( properties.getVariableMods().containsKey( stavroxResidue ) ) {
-		    	nakedPeptide += properties.getVariableMods().get( stavroxResidue ).getFrom();		// use the unmodded code for this residue
+		    else if( properties.getVariableMods().containsKey( MeroXResidue ) ) {
+		    	nakedPeptide += properties.getVariableMods().get( MeroXResidue ).getFrom();		// use the unmodded code for this residue
 		    	
 		    	// add this mod to the collection of mods for this peptide
 		    	ParsedPeptideModification mod = new ParsedPeptideModification();
 		    	mod.setPosition( peptidePosition );
-		    	mod.setMass( properties.getVariableMods().get( stavroxResidue ).getMassShift( properties ) );
+		    	mod.setMass( properties.getVariableMods().get( MeroXResidue ).getMassShift( properties ) );
 		    	
 		    	mods.add( mod );
 		    }
 		    
 		    // neither a variable or a static mod
 		    else {
-		    	nakedPeptide += stavroxResidue;
+		    	nakedPeptide += MeroXResidue;
 		    }
 		    
 		}
 		
 		// handle the positions
-		stavroxPosition1 = stavroxPosition1.substring( 1 );
-		int position1 = Integer.parseInt( stavroxPosition1 );
+		MeroXPosition1 = MeroXPosition1.substring( 1 );
+		int position1 = Integer.parseInt( MeroXPosition1 );
 		if( position1 == 0 ) { position1 = 1; }
 		
-		stavroxPosition2 = stavroxPosition2.substring( 1 );
-		int position2 = Integer.parseInt( stavroxPosition2 );
+		MeroXPosition2 = MeroXPosition2.substring( 1 );
+		int position2 = Integer.parseInt( MeroXPosition2 );
 		if( position2 == 0 ) { position2 = 1; }
 				
 		ParsedPeptide peptide = new ParsedPeptide();
@@ -174,45 +174,45 @@ public class ParsedPeptideUtils {
 		return peptide;
 	}
 	
-	private static ParsedPeptide getCrosslinkedParsedPeptide( String stavroxPeptide, String stavroxPosition, AnalysisProperties properties ) throws Exception {
+	private static ParsedPeptide getCrosslinkedParsedPeptide( String MeroXPeptide, String MeroXPosition, AnalysisProperties properties ) throws Exception {
 		String nakedPeptide = "";
 		Collection<ParsedPeptideModification> mods = new ArrayList<ParsedPeptideModification>();
 		
 		// merox peptide all being with either { or [ and end with } or ]. Remove the first and last characters
-		stavroxPeptide = stavroxPeptide.substring(1, stavroxPeptide.length() - 1);
+		MeroXPeptide = MeroXPeptide.substring(1, MeroXPeptide.length() - 1);
 		
 		
-		for (int i = 0; i < stavroxPeptide.length(); i++){
-		    String stavroxResidue = String.valueOf( stavroxPeptide.charAt(i) );
+		for (int i = 0; i < MeroXPeptide.length(); i++){
+		    String MeroXResidue = String.valueOf( MeroXPeptide.charAt(i) );
 		    int peptidePosition = i + 1;
 
 		    // is this a static mod?
-		    if( properties.getStaticMods().containsKey( stavroxResidue ) ) {
-		    	nakedPeptide += properties.getStaticMods().get( stavroxResidue ).getFrom();		// use the unmodded code for this residue
+		    if( properties.getStaticMods().containsKey( MeroXResidue ) ) {
+		    	nakedPeptide += properties.getStaticMods().get( MeroXResidue ).getFrom();		// use the unmodded code for this residue
 		    }
 		    
 		    // is this a variable mod?
-		    else if( properties.getVariableMods().containsKey( stavroxResidue ) ) {
-		    	nakedPeptide += properties.getVariableMods().get( stavroxResidue ).getFrom();		// use the unmodded code for this residue
+		    else if( properties.getVariableMods().containsKey( MeroXResidue ) ) {
+		    	nakedPeptide += properties.getVariableMods().get( MeroXResidue ).getFrom();		// use the unmodded code for this residue
 		    	
 		    	// add this mod to the collection of mods for this peptide
 		    	ParsedPeptideModification mod = new ParsedPeptideModification();
 		    	mod.setPosition( peptidePosition );
-		    	mod.setMass( properties.getVariableMods().get( stavroxResidue ).getMassShift( properties ) );
+		    	mod.setMass( properties.getVariableMods().get( MeroXResidue ).getMassShift( properties ) );
 		    	
 		    	mods.add( mod );
 		    }
 		    
 		    // neither a variable or a static mod
 		    else {
-		    	nakedPeptide += stavroxResidue;
+		    	nakedPeptide += MeroXResidue;
 		    }
 		    
 		}
 		
 		// handle the position
-		stavroxPosition = stavroxPosition.substring( 1 );
-		int position = Integer.parseInt( stavroxPosition );
+		MeroXPosition = MeroXPosition.substring( 1 );
+		int position = Integer.parseInt( MeroXPosition );
 		if( position == 0 ) { position = 1; }
 		
 				

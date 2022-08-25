@@ -1,0 +1,40 @@
+# on a release:
+# build with java 11, build docker image, push to docker hub
+# build with java 8 and attach as asset to release
+
+name: Release Workflow
+
+on:
+  release:
+    types: [released]
+    tags:
+      - 'v*'
+
+env:
+  EXECUTABLE_JAR: "merox2ProxlXML.jar"
+
+jobs:
+  release:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up JDK 8
+      uses: actions/setup-java@v2
+      with:
+        java-version: '8'
+        distribution: 'adopt'
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+    - name: Build with Gradle
+      run: ./gradlew shadowJar
+    - name: Upload binary to release
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: build/libs/${{ env.EXECUTABLE_JAR }}
+        asset_name: ${{ env.EXECUTABLE_JAR }}
+        tag: ${{ github.ref }}
+        overwrite: true
+        body: ""

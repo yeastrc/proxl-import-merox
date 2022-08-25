@@ -1,6 +1,6 @@
-Starting up StavroX 3 to proxl XML Converter (version #VERSION#)
+Starting up MeroX 3 to proxl XML Converter (version #VERSION#)
 
 Please report problems by submitting issues on GitHub at:
-https://github.com/yeastrc/proxl-import-stavrox
+https://github.com/yeastrc/proxl-import-MeroX
 Or by email to Michael Riffle <mriffle@uw.edu>
 

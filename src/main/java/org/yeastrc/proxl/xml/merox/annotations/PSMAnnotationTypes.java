@@ -20,7 +20,7 @@ public class PSMAnnotationTypes {
 	public static final String ANNOTATION_TYPE_FDR = "FDR";
 	
 	/**
-	 * Get the list of filterable PSM annotation types in StavroX data
+	 * Get the list of filterable PSM annotation types in MeroX data
 	 * @return
 	 */
 	public static List<FilterablePsmAnnotationType> getFilterablePsmAnnotationTypes() {
@@ -29,7 +29,7 @@ public class PSMAnnotationTypes {
 		{
 			FilterablePsmAnnotationType type = new FilterablePsmAnnotationType();
 			type.setName( ANNOTATION_TYPE_SCORE );
-			type.setDescription( "StavroX Score" );
+			type.setDescription( "MeroX Score" );
 			type.setDefaultFilterValue( new BigDecimal( "50" ) );
 			type.setDefaultFilter( false );
 			type.setFilterDirection( FilterDirectionType.ABOVE );
@@ -63,7 +63,7 @@ public class PSMAnnotationTypes {
 	}
 	
 	/**
-	 * Get the list of descriptive (non-filterable) PSM annotation types in StavroX data
+	 * Get the list of descriptive (non-filterable) PSM annotation types in MeroX data
 	 * @return
 	 */
 	public static List<DescriptivePsmAnnotationType> getDescriptivePsmAnnotationTypes() {

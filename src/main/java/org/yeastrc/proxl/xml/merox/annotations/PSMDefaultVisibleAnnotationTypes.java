@@ -9,7 +9,7 @@ import org.yeastrc.proxl_import.api.xml_dto.SearchAnnotation;
 public class PSMDefaultVisibleAnnotationTypes {
 
 	/**
-	 * Get the default visibile annotation types for StavroX data
+	 * Get the default visibile annotation types for MeroX data
 	 * @return
 	 */
 	public static List<SearchAnnotation> getDefaultVisibleAnnotationTypes() {

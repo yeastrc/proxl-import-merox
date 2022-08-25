@@ -179,7 +179,7 @@ public class ResultsReader {
 	}
 	
 	/**
-	 * StavroX can report the scan number in different ways, depending the file format of the scan file. Attempt
+	 * MeroX can report the scan number in different ways, depending the file format of the scan file. Attempt
 	 * to get the scan number based on ways I've thus far encountered.
 	 * 
 	 * @param scanNumberField

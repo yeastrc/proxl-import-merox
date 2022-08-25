@@ -3,7 +3,7 @@ package org.yeastrc.proxl.xml.merox.reader;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 /**
- * A representation of an amino acid by StavroX
+ * A representation of an amino acid by MeroX
  * @author mriffle
  *
  */

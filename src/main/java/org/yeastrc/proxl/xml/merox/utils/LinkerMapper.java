@@ -5,19 +5,9 @@ import java.util.Map;
 
 public class LinkerMapper {
 
-	/**
-	 * Get the name of the merox crosslinker (found in the properties file) for the
-	 * proxl-based crosslinker abbreviation.
-	 * 
-	 * @param proxlAbbr
-	 * @return
-	 * @throws Exception
-	 */
-	public static String getStavroxCrosslinkerName( String proxlAbbr ) throws Exception {
+	private static final Map<String, String> linkerMap = new HashMap<String, String>();
 
-		// map of proxl linker names to merox linker names
-		Map<String, String> linkerMap = new HashMap<String, String>();
-
+	static {
 		linkerMap.put( "dss", "DSS/BS3" );
 		linkerMap.put( "bs3", "DSS/BS3" );
 		linkerMap.put( "dss.sty", "DSS/BS3" );
@@ -27,7 +17,21 @@ public class LinkerMapper {
 		linkerMap.put( "sulfo-smcc", "Sulfo-SMCC");
 		linkerMap.put( "dsso", "DSSO" );
 		linkerMap.put( "tg", "TG" );
+	}
 
+	public static Map<String, String> getLinkerMap() {
+		return linkerMap;
+	}
+
+	/**
+	 * Get the name of the merox crosslinker (found in the properties file) for the
+	 * proxl-based crosslinker abbreviation.
+	 * 
+	 * @param proxlAbbr
+	 * @return
+	 * @throws Exception
+	 */
+	public static String getMeroXCrosslinkerName( String proxlAbbr ) throws Exception {
 		
 		if( linkerMap.containsKey( proxlAbbr ) )
 			return linkerMap.get( proxlAbbr );

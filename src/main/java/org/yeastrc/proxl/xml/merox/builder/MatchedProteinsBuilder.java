@@ -8,9 +8,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-import org.yeastrc.fasta.FASTAEntry;
-import org.yeastrc.fasta.FASTAHeader;
-import org.yeastrc.fasta.FASTAReader;
+import org.yeastrc.proteomics.fasta.FASTAEntry;
+import org.yeastrc.proteomics.fasta.FASTAFileParser;
+import org.yeastrc.proteomics.fasta.FASTAFileParserFactory;
+import org.yeastrc.proteomics.fasta.FASTAHeader;
 import org.yeastrc.proxl_import.api.xml_dto.MatchedProteins;
 import org.yeastrc.proxl_import.api.xml_dto.Peptide;
 import org.yeastrc.proxl_import.api.xml_dto.Peptides;
@@ -86,8 +87,8 @@ public class MatchedProteinsBuilder {
         		if( anno.getDescription() != null )
         			xmlProteinAnnotation.setDescription( anno.getDescription() );
         			
-        		if( anno.getTaxonomId() != null )
-        			xmlProteinAnnotation.setNcbiTaxonomyId( new BigInteger( anno.getTaxonomId().toString() ) );
+        		if( anno.getTaxonomyId() != null )
+        			xmlProteinAnnotation.setNcbiTaxonomyId( new BigInteger( anno.getTaxonomyId().toString() ) );
         	}
 		}
 	}
@@ -106,14 +107,10 @@ public class MatchedProteinsBuilder {
 	private Map<String, Collection<FastaProteinAnnotation>> getProteins( Collection<String> allPetpideSequences, File fastaFile, Collection<String> decoyIdentifiers ) throws Exception {
 		
 		Map<String, Collection<FastaProteinAnnotation>> proteinAnnotations = new HashMap<>();
-		
-		FASTAReader fastaReader = null;
-		
-		try {
-			
-			fastaReader = FASTAReader.getInstance( fastaFile );
-			
-			for( FASTAEntry entry = fastaReader.readNext(); entry != null; entry = fastaReader.readNext() ) {
+
+		try ( FASTAFileParser parser = FASTAFileParserFactory.getInstance().getFASTAFileParser(fastaFile) ) {
+
+			for ( FASTAEntry entry = parser.getNextEntry(); entry != null; entry = parser.getNextEntry() ) {
 
 				if( isDecoyFastaEntry( entry, decoyIdentifiers ) )
 					continue;
@@ -129,22 +126,12 @@ public class MatchedProteinsBuilder {
 					
             		Integer taxId = GetTaxonomyId.getInstance().getTaxonomyId( header.getName(), header.getDescription() );
             		if( taxId != null )
-            			anno.setTaxonomId( taxId );
+            			anno.setTaxonomyId( taxId );
             		
 					proteinAnnotations.get( entry.getSequence() ).add( anno );
 				}
 			}
-			
-			
-		} finally {
-			if( fastaReader != null ) {
-				fastaReader.close();
-				fastaReader = null;
-			}
 		}
-		
-		
-		
 		return proteinAnnotations;
 	}
 	
@@ -231,8 +218,8 @@ public class MatchedProteinsBuilder {
 			if( this.getDescription() != null )
 				hashString += this.getDescription();
 			
-			if( this.getTaxonomId() != null )
-				hashString += this.getTaxonomId().intValue();
+			if( this.getTaxonomyId() != null )
+				hashString += this.getTaxonomyId().intValue();
 			
 			return hashString.hashCode();
 		}
@@ -261,15 +248,15 @@ public class MatchedProteinsBuilder {
 					return false;
 				
 				
-				if( this.getTaxonomId() == null ) {
-					if( otherAnno.getTaxonomId() != null )
+				if( this.getTaxonomyId() == null ) {
+					if( otherAnno.getTaxonomyId() != null )
 						return false;
 				} else {
-					if( otherAnno.getTaxonomId() == null )
+					if( otherAnno.getTaxonomyId() == null )
 						return false;
 				}
 				
-				if( !this.getTaxonomId().equals( otherAnno.getTaxonomId() ) )
+				if( !this.getTaxonomyId().equals( otherAnno.getTaxonomyId() ) )
 					return false;
 				
 				
@@ -280,7 +267,6 @@ public class MatchedProteinsBuilder {
 			}
 		}
 
-		
 		public String getName() {
 			return name;
 		}
@@ -293,18 +279,16 @@ public class MatchedProteinsBuilder {
 		public void setDescription(String description) {
 			this.description = description;
 		}
-		public Integer getTaxonomId() {
-			return taxonomId;
+		public Integer getTaxonomyId() {
+			return taxonomyId;
 		}
-		public void setTaxonomId(Integer taxonomId) {
-			this.taxonomId = taxonomId;
+		public void setTaxonomyId(Integer taxonomyId) {
+			this.taxonomyId = taxonomyId;
 		}
 
-		
-		
 		private String name;
 		private String description;
-		private Integer taxonomId;
+		private Integer taxonomyId;
 		
 	}
 	
