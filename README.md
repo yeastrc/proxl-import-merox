@@ -1,7 +1,7 @@
 MeroX 2 to Proxl XML Converter
 =============================
 
-Use this program to convert the results of a MeroX 2 analysis to Proxl XML suitable for import into the proxl web application.
+Use this program to convert the results of a MeroX 2 (https://www.stavrox.com/) analysis to Proxl XML suitable for import into the proxl web application.
 
 How To Run
 -------------
