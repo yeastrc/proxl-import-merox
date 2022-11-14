@@ -7,11 +7,21 @@ How To Run
 -------------
 1. Download the [latest release](https://github.com/yeastrc/proxl-import-merox/releases).
 2. Run the program ``java -jar merox2ProxlXML.jar`` with no arguments to see the possible parameters.
-3. Run the program, e.g., ``java -jar merox2ProxlXML.jar -r ./results.zhrm -l dss -f FASTA yeast2016.fa -a 1 -o ./output.proxl.xml``
+3. Run the program, e.g., ``java -jar ~/jars/merox2ProxlXML.jar -r ./results.zhrm -f ./yeast.fa -o results.xml -v``
 
-In the above example, ``output.proxl.xml`` will be created and be suitable for import into ProXL.
+In the above example, ``results.xml`` will be created and be suitable for import into ProXL.
 
 For more information on importing data into Proxl, please see the [Proxl Import Documentation](http://proxl-web-app.readthedocs.io/en/latest/using/upload_data.html).
+
+Note about 15N labelled data
+-----------------------------
+For Proxl to correctly handle 15N-labelled data, the FASTA file entries for 15N labeled proteins must all begin with the same prefix. For example, the non-labeled
+alpha tubulin FASTA entry may begin with ">alpha_tubulin", whereas 15N alpha tubulin entry would begin with ">15N_alpha_tublin".
+All entries for 15N labelled proteins would have to begin with "15N_". This "15N_" prefix can be whatever you like, but it
+must be consistent and uniquely identify 15N labelled FASTA protein entries.
+
+Then when running this converter, this "15N" prefix must be passed in using the `--15N-prefix=` parameter. For example:
+``java -jar ~/jars/merox2ProxlXML.jar -r ./results.zhrm -f ./yeast.fa --15N-prefix=15N_ -o results.xml -v``.
 
 More Information About Proxl
 -----------------------------
@@ -20,62 +30,34 @@ For more information about Proxl, visit http://proxl-ms.org/.
 Command line documentation
 ---------------------------
 
-Usage: ``java -jar merox2ProxlXML.jar -r /path/to/results.file -l linker -f FASTA file full path [-s scan file name] -o /path/to/output.proxl.xml``
+```
+java -jar merox2ProxlXML.jar [-hvV] [--15N-prefix=<N15prefix>] -f=<fastaFile>
+                             -o=<outFile> -r=<zhrmFile> [-s=<scanFilename>]
 
-E.g.:
+Description:
 
- ``java -jar merox2ProxlXML.jar -r ./results.zhrm -l dss -f /path/to/yeast2016.fa -s mydata.mzML -o ./output.proxl.xml``
+Convert the results of a MeroX analysis to a Proxl XML file suitable for import
+into Proxl.
 
- ``java -jar merox2ProxlXML.jar -r ./results.zhrm -l dss -f /path/to/yeast2016.fa -o ./output.proxl.xml``
+More info at: https://github.com/yeastrc/proxl-import-merox
 
- ``java -jar merox2ProxlXML.jar -r ./results.zhrm -l dss -f FASTA /path/to/yeast2016.fa -a 1 -s mydata.mzML -o ./output.proxl.xml``
-
-
-Required parameters:
-
-    -r </path/to/results.zhrm> -- The full path to the results file from the
-                                  MeroX analysis.
-    
-    -f </path/to/fasta.fa> -- The full path to the FASTA file used in the
-                              MeroX analysis.
-    
-    -l <name of cross-linker> -- The name of the cross-linker used. See
-                                 below for a list of valid linkers.
-    
-    -o </path/to/output.xml> -- The full path to the desired output proxl
-                                XML file.
-
-
-Optional parameters:
-
-    -s <scan file name> -- The name of the scan file (e.g. mydata.mzML). Used to
-                           annotate PSMs with the name of the scan file in which
-                           the scan can be found.
-
-	-a <scan number adjustment> -- Adjust the reported scan number by this amount.
-
-	As of this writing, MeroX 2 has a bug in the parsing of mzML files that
-	causes incorrect scan numbers to be reported. It uses the spectrum index
-	instead of the scan number of the spectrum at that index. This causes
-	a mismatch when the ProXL XML importer attempts to find the referenced
-	scans. In testing, the true scan number appears to always be 1 higher
-	than the reported scan number when using mzML files. "-a 1" will adjust
-	the scan numbers appropriately.
-	
-	
-	-i <import FDR cutoff> -- PSMs with a FDR greater than this amount will not
-	                          be imported into ProXL. Default is 0.05. If set
-	                          to a value greater than or equal to 1, no import
-	                          FDR will be used.
-	
-
-Valid linkers:
- * dss
- * bs3
- * edc
- * bs2
- * sulfo-smcc
- * dsso
- * tg (short for transglutaminase)
- * bs3.sty (supports links from K/nterm-K/S/T/Y/nterm)
- * dss.sty (supports links from K/nterm-K/S/T/Y/nterm)
+Options:
+  -r, --zhrm-file=<zhrmFile> The full path to the results file from the MeroX
+                               analysis.
+  -f, --fasta-file=<fastaFile>
+                             The full path to the FASTA file used in the MeroX
+                               analysis.
+  -o, --out-file=<outFile>   The full path to the desired output proxl XML file.
+  -s, --scan-filename=<scanFilename>
+                             The name of the scan file (e.g., mydata.mzML) used to
+                               search the data. Used to annotate PSMs with the name
+                               of the scan file, required if using Bibliospec to
+                               create a spectral library for Skyline.
+      --15N-prefix=<N15prefix>
+                             (Optional) Protein names with this prefix are
+                               considered 15N labeled. E.g., 15N_
+  -v, --verbose              If present, complete error messages will be printed.
+                               Useful for debugging errors.
+  -h, --help                 Show this help message and exit.
+  -V, --version              Print version information and exit.
+```
