@@ -7,7 +7,7 @@ How To Run
 -------------
 1. Download the [latest release](https://github.com/yeastrc/proxl-import-merox/releases).
 2. Run the program ``java -jar merox2ProxlXML.jar`` with no arguments to see the possible parameters.
-3. Run the program, e.g., ``java -jar ~/jars/merox2ProxlXML.jar -r ./results.zhrm -f ./yeast.fa -o results.xml -v``
+3. Run the program, e.g., ``java -jar ~/jars/merox2ProxlXML.jar -r ./results.zhrm -f ./yeast.fa -o results.xml``
 
 In the above example, ``results.xml`` will be created and be suitable for import into ProXL.
 
