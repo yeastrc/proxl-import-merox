@@ -101,11 +101,11 @@ public class Result {
 		this.rank = rank;
 	}
 
-	public int getRetentionTimeSeconds() {
+	public double getRetentionTimeSeconds() {
 		return retentionTimeSeconds;
 	}
 
-	public void setRetentionTimeSeconds(int retentionTime) {
+	public void setRetentionTimeSeconds(double retentionTime) {
 		this.retentionTimeSeconds = retentionTime;
 	}
 
@@ -139,7 +139,7 @@ public class Result {
 	private double observedMass;
 	private double candidateMass;
 	private double deviation;
-	private int retentionTimeSeconds;
+	private double retentionTimeSeconds;
 	private String peptide1;
 	private String peptide2;
 	private String proteins1;

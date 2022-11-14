@@ -75,7 +75,7 @@ public class ResultsReader {
 				result.setObservedMass( Double.parseDouble( fields[ 3 ] ) );
 				result.setCandidateMass( Double.parseDouble( fields [ 4 ] ) );
 				result.setDeviation( Double.parseDouble( fields [ 5 ] ) );
-				result.setRetentionTimeSeconds(Integer.parseInt(fields[18]));
+				result.setRetentionTimeSeconds(Double.parseDouble(fields[18]));
 				result.setqValue(Double.parseDouble(fields[24]));
 
 				result.setPeptide1(fields[6]);
