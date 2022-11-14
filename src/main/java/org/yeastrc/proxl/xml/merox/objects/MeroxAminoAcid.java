@@ -1,4 +1,4 @@
-package org.yeastrc.proxl.xml.merox.reader;
+package org.yeastrc.proxl.xml.merox.objects;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 

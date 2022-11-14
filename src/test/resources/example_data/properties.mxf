@@ -1,0 +1,317 @@
+ELEMENTS 					//List of all elements with exact masses, maximum two letters allowed first one must be upper case, second one must be lower case
+  C;12.0
+  D;2.01410178
+  Ch;13.00335484
+  F;18.9984032
+  H;1.00782503
+  Cl;34.9688527
+  I;126.904468
+  K;38.9637069
+  N;14.003074
+  O;15.99491462
+  P;30.973762
+  Br;78.9183376
+  S;31.97207117
+  Na;22.9897697
+  T;3.01604927
+  Si;27.9769265
+  Proton;1.00727638
+  Oh;17.99915961
+  Nh;15.0001089
+  Li;60.151223
+  Fe;55.9349393
+END
+MINMASS=1000.0				//minimum mass for peptides / cross-links
+MAXMASS=6000.0				//maximum mass for peptides / cross-links
+PRECISIONMS=5.0				//precision of MS1 matching in ppm
+PRECISIONMS2=10.0			//precision of MS2 matching in ppm or Da (see MS2UNIT)
+MSRECALIBRATION=0.0			//recalibrate the masses of MS1 signals by x ppm
+MS2RECALIBRATION=0.0		//recalibrate the masses of MS2 signals by x ppm/Da (see MS2UNIT)
+MS2UNIT=ppm					//Unit of MS2 comparison
+SNRATIO=2.0					//signal-to-noise ratio
+MAXRANGE=0.1				//
+MINCHARGE=2					//minimum charge of precursor ions to be considered
+IGNORECHARGESTATE=0			//Ignore charge state determined by conversion software (not recommended!)
+TESTCHARGES=3;4;5			//Charges to test, if actualcharge state is ignored (separated by ;)
+PROTONMASS=1.00727638		//mass of protons
+IONTYPE=by					//iontypes to be considered
+DIGITSMSMS=3				//number of digits presented in GUI for MS2 signals
+DIGITSMS=3					//number of digits presented in GUI for MS1 signals
+DIGITSDEVIATION=2			//number of digits presented in GUI for mass deviation
+MINPEPLENGTH=5				//minimum length of peptide sequences to consider
+MAXPEPLENGTH=30				//maximum length of peptides to consider
+MAXMISSEDCLEAVAGES=3		//maximum number of misscleavages in total (for all proteases sites combined.)
+UNSPECIFICDIGEST=0			//unspecific digest (0-Off, 1-On)
+SEMIUNSPECIFICDIGEST=0		//semiunspecific digest (0-Off, 1-On) only one side of the peptides needs to arise from one of the defined preotease sites
+UNIQUEPEPTIDESONLY=0		//only peptides that are unique within the provided database will be considered
+L_EQUALS_I=0 				//When determining unique peptides, Leucine is not differentiated from Isoleucine (0-Off, 1=On)
+LOSSSETTING=2				//Consider losses of MS2 signals: 1 - No losses considered, 2 - neutral losses only of identified signals, 3 - neutral losses of all possible fragments
+MAXLOSSES=1					//maximum number of neutral losses per fragment ion
+INCLUDESPECIFIC=0			//include a specified loss for all fragment  ions (see SPECIFICLOSS)
+SPECIFICLOSS=CO2			//elemental composition of the specific loss (see INCLUDESPECIFICLOSS)
+INCLUDESPECIFICPREC=0		//Include specific precursor loss defined for the cross-linker (e.g. N2)
+SCOREDEPTH=4				//Depth of scoring e.g. number of mass-shifted spectra to compare to 0 - no scoring 1-4 increasing depth
+SCORECUTOFF=50.0			//minimum score required to save candidate to result file
+FDRCUTOFF=0.01				//maximum false discovery rate for cross-link identification
+APPLYFDR=1					//calculate FDR and use as filter (0-Off, 1-On) recommended to be always on
+ONLYSHOWBESTRESULTS=1		//Only save the best scoring candidate to the result file (0-Off, 1-On) if off, the candidates will be ranked for each spectrum by the score.
+SAVEDECOYS=1				//Save decoy hits in the reuslt file and show them in the canduadate table
+CONSECUTIVEPEPTIDES=0		//exclude consecutive sequences for type 2 cross-links (0-include, 1-exclude)
+PRESCORE=1					//perform a prescoring to sort out bad matching spectra more quickly (0-Off, 1-On)
+PRESCRLIMIT=0.1				//minimum coverage of total intensity of signals (excluding precursor region)
+MINPEPSCORE=10				//mimimum score for individual peptides (only applies to RISEUP and proteome-wide mode)
+MINPEPSCOREQUADRATIC=10		//mimimum score for individual peptides (used in quadratic mode)
+MINFRAGMENTSPERPEPTIDE=3	// minimum number of fragments per peptide in a cross-link
+DEISOTOPE=1					//perform deisotoping on MS2 spectra (0-Off, 1-On) recommended to be on. Turn off, if spectra are already deisotoped (charge information on signals will be lost then)
+ANALYSISMODE=0				//0-Quadratic search space 1-RISE-Mode 2-ProteomeMode 3-RISEUP-Mode
+MAXMISSINGFRAGMENTS=1		//Number of missing cross-linker fragments from a complete pattern to still be recognized by RISE- and RISEUP-mode
+INCLUDEINTERNALFRAGMENTS=1	//include fragments in scoring matching linear ions from cross-linker fragmentation (Mass-modification = 0Da)
+MIXEDTARGETDECOY=1			//Include mixed decoys, where only of the two peptides is from the decoy database. (0-Off, 1-On) Recommended to be always on.
+DECOYTYPE=0					//Type of decoy database generation: (0-shuffle protein sequences but Keep protease sites, 1-shuffle protein sequences, 2-reverse protein sequences)
+DECOYLEVEL=2				//Expert option! recommend to use 2! Basis of decoy database generation: (0-Only Fasta-entries labelled with decoy, 1-protein-level, 2-peptide-level)
+DECOYIDENTIFIER=DEC_		//Prefix to fasta header defining decoy entries in the fasta file e.g.: >DEC_sp|P02769|ALBU_BOVIN Serum albumin OS=Bos taurus OX=9913 GN=ALB PE=1 SV=4
+PERFORMDECOY=1				//Run decoy analysis in parallel (0-Off, 1-On) Recommended to be always on.
+INCLUDECRAP=0				//Include a database of common contaminating proteins (cRAP) (0-Off, 1-On) Not recommended in Quadratic search-mode (StavroX-mode)
+INTRAPEPTIDAL=0				//Search for intrapeptidal (type 1) cross-links (0-Off, 1-On)
+DEADEND=0					//Search for dead-end (type 0) cross-links (0-Off, 1-On)
+CORRECTPRECURSORMASSES=0	//Correct wrongly assigned precursor masses (errors during format conversion) (0-Off, 1-On). For mzML and mzXML MS1 data is used to correct. For other file types, different precursor masses are checked with up to <N-VALUE> isotope shifts
+N_VALUE=3					//maximum number of isotopshifts for precursor mass correction
+D_VALUE=1.0033548			//mass difference of 13C and 12C used for precursor mass correction
+SAVESPECTRATOTEMP=0			//spectra are saved to a temporary folder. (0-Off, 1-On) mzML and mzXML are always saved to temporary folder. For other file types this might reduce RAM-load, but takes more time.
+IONTYPES					//2 additional ion types can be defined here.
+  z';-NH;C
+  z'';-N;C
+END
+AMINOACIDS					//definition of all amino acids with name;single-letter code;composition. Peptide and Protein termini are also defined
+  Alanine;A;C3H5NO
+  Cysteine acetamide;B;C5H8N2O2S
+  Cysteine;C;C3H5NOS
+  Asparaginic acid;D;C4H5NO3
+  Glutamic acid;E;C5H7NO3
+  Phenylalanine;F;C9H9NO
+  Glycine;G;C2H3NO
+  Histidine;H;C6H7N3O
+  Isoleucine;I;C6H11NO
+  Lysine;K;C6H12N2O
+  Leucine;L;C6H11NO
+  Methionine;M;C5H9NOS
+  Asparagine;N;C4H6N2O2
+  Proline;P;C5H7NO
+  Glutamine;Q;C5H8N2O2
+  Arginine;R;C6H12N4O
+  Serine;S;C3H5NO2
+  Threonine;T;C4H7NO2
+  Valine;V;C5H9NO
+  Tryptophane;W;C11H10N2O
+  Acetylation (N-Term - var_mod of '{');X;C2OH3
+  Tyrosine;Y;C9H9NO2
+  Hydrogen N-Terminal;[;H
+  Hydroxy C-Terminal;];OH
+  N-myristylation;#;C14H27O
+  Pyroglutamic acid (N-Term - var_mod of '{');(;C5H5N1O2
+  Trimethyl-Lysine;k;C9H18N2O
+  Methionine oxidized;m;C5H9NO2S
+  N-formylation (N-Term - var_mod of '{');/;COH
+  Hydrogen protein-N-Terminus;{;H
+  Hydroxy protein C-Terminus;};OH
+END
+USEDCROSSLINKER=BS3/DSS				//Cross-linker that is selected from the following list.
+
+CROSSLINKER=Formaldehyde(24)
+  COMPOSITION=C2
+  COMPHEAVY=
+  SITE1=K{
+  SITE2=KSTY{
+  MAXIMUMDISTANCE=14.5
+END
+
+CROSSLINKER=BS3/DSS-D0/D12
+  COMPOSITION=C8H10O2
+  COMPHEAVY=C8D12O2-H2
+  SITE1=K{
+  SITE2=KSTY{
+  MAXIMUMDISTANCE=23.8
+  RETENTIONDIFF=40
+  MODSITE1
+    Pep;;0
+  MODSITE2
+    Pep;;0
+END
+
+CROSSLINKER=DSBU
+  COMPOSITION=C9O3N2H12
+  COMPHEAVY=
+  SITE1=K{
+  SITE2=KSTY{
+  MAXIMUMDISTANCE=26.9
+  CNL=C4H7NO
+  DEADENDMOLECULE=H2O
+  REPORTERIONS
+    RBu;C9N2OH17
+    RBuUr;C10N2O2H15
+  MODSITE1
+    Bu;C4NOH7;1
+    BuUr;C5O2NH5;1
+    Pep;;0
+  MODSITE2
+    Bu;C4NOH7;1
+    BuUr;C5O2NH5;1
+    Pep;;0
+END
+
+CROSSLINKER=DSAU
+  COMPOSITION=C5N2O3H4
+  COMPHEAVY=
+  SITE1=K{
+  SITE2=KSTY{
+  MAXIMUMDISTANCE=23.0
+  DEADENDMOLECULE=H2O
+  MODSITE1
+    Ac;C2NOH3;1
+    AcUr;C3O2NH;1
+    Pep;;0
+  MODSITE2
+    Ac;C2NOH3;1
+    AcUr;C3O2NH;1
+    Pep;;0
+END
+
+CROSSLINKER=Formaldehyde(12)
+  COMPOSITION=C
+  COMPHEAVY=
+  SITE1=K{
+  SITE2=KSTY{
+  MAXIMUMDISTANCE=14.5
+END
+
+CROSSLINKER=DST
+  COMPOSITION=C4O4H2
+  COMPHEAVY=
+  SITE1=K{
+  SITE2=KSTY{
+  MAXIMUMDISTANCE=18.65
+  DEADENDMOLECULE=H2O
+  MODSITE1
+    Pep;;0
+  MODSITE2
+    Pep;;0
+END
+
+CROSSLINKER=EDC
+  COMPOSITION=-H2O
+  COMPHEAVY=
+  SITE1=K{
+  SITE2=DE}
+  MAXIMUMDISTANCE=11.2
+  DEADENDMOLECULE=H2O
+  MODSITE1
+    Pep;;0
+  MODSITE2
+    Pep;;0
+END
+
+CROSSLINKER=CDI
+  COMPOSITION=CO-H2
+  COMPHEAVY=
+  SITE1=K{
+  SITE2=KSTY{
+  MAXIMUMDISTANCE=16.0
+  DEADENDMOLECULE=H2O
+  MODSITE1
+    CO;CO-H2;1
+    Pep;;1
+  MODSITE2
+    CO;CO-H2;1
+    Pep;;1
+END
+
+CROSSLINKER=DSSO
+  COMPOSITION=C6O3SH6
+  COMPHEAVY=
+  SITE1=K{
+  SITE2=KSTY{
+  MAXIMUMDISTANCE=23.5
+  DEADENDMOLECULE=H2O
+  MODSITE1
+    A;C3OH2;1
+    T;C3OSH2;1
+    S;C3O2SH4;0
+    Pep;;0
+  MODSITE2
+    A;C3OH2;1
+    T;C3OSH2;1
+    S;C3O2SH4;0
+    Pep;;0
+END
+
+CROSSLINKER=SDA
+  COMPOSITION=C5H6O
+  COMPHEAVY=
+  SITE1=K{
+  SITE2=DE}
+  MAXIMUMDISTANCE=16.0
+  DEADENDMOLECULE=H2O
+  MODSITE1
+    Pep�+82u;C5H6O;1
+    Pep�+100u;C5H8O2;1
+    Pep�;;1
+  MODSITE2
+    Pep#;;1
+END
+
+CROSSLINKER=DC4
+  COMPOSITION=C14O2N2H20
+  COMPHEAVY=
+  SITE1=K{
+  SITE2=KSTY{
+  MAXIMUMDISTANCE=32.5
+  DEADENDMOLECULE=H2O
+  REPORTERIONS
+    R-DABCO;C10N2O2H19
+  MODSITE1
+    Fur;C4H4O;1
+    DABCO;C10ON2H16;1
+    Pep;;0
+  MODSITE2
+    Fur;C4H4O;1
+    DABCO;C10ON2H16;1
+    Pep;;0
+END
+
+CROSSLINKER=BS3/DSS
+  COMPOSITION=C8H10O2
+  COMPHEAVY=
+  SITE1=K{
+  SITE2=KSTY{
+  MAXIMUMDISTANCE=23.8
+  MODSITE1
+    Pep;;0
+  MODSITE2
+    Pep;;0
+END
+
+CROSSLINKER=BS2G
+  COMPOSITION=C5H4O2
+  COMPHEAVY=C5D4O2
+  SITE1=K{
+  SITE2=KSTY{
+  MAXIMUMDISTANCE=19.8
+  RETENTIONDIFF=40
+  DEADENDMOLECULE=H2O
+  MODSITE1
+    Pep;;0
+  MODSITE2
+    Pep;;0
+END
+PROTEASE						//List of protease sites
+  R?;3;P;0
+  K?;3;P;1
+END
+POSTRANSLATIONALMODIFICATION	//List of possible posttranslational modifications (peptide level, no localization attempted)
+END
+VARMODIFICATION					//List of variable modifications (residue-level, different localizations tested)
+  M;m;1
+END
+STATMODIFICATION				//List of static modifications (all residues will be modified)
+  C;B
+END

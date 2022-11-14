@@ -12,6 +12,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.yeastrc.proxl.xml.merox.constants.MeroxConstants;
+import org.yeastrc.proxl.xml.merox.objects.MeroxCrosslinker;
+import org.yeastrc.proxl.xml.merox.objects.Result;
 
 /**
  * Read the PSM-level results from Results.csv in the zipped results file
@@ -29,7 +31,7 @@ public class ResultsReader {
 	 * @return
 	 * @throws Exception
 	 */
-	public List<Result> getAnalysisResults( InputStream is ) throws Exception {
+	public List<Result> getAnalysisResults(InputStream is, String N15prefix ) throws Exception {
 		
 		/**
 		 * This map maps scan numbers to a map of scores found for PSMs for that scan that are linked to the results with that score.
@@ -73,25 +75,19 @@ public class ResultsReader {
 				result.setObservedMass( Double.parseDouble( fields[ 3 ] ) );
 				result.setCandidateMass( Double.parseDouble( fields [ 4 ] ) );
 				result.setDeviation( Double.parseDouble( fields [ 5 ] ) );
-				
-				result.setPeptide1( fields [ 6 ] );
-				result.setPeptide2( fields[ 10 ] );
-				
-				// skip dead-ends (monolinks) and nulls (looplinks) for now
-				//if( result.getPeptide2().equals( "0" ) || result.getPeptide2().equals( "1" ) ) continue;
-				
+				result.setRetentionTimeSeconds(Integer.parseInt(fields[18]));
+				result.setqValue(Double.parseDouble(fields[24]));
+
+				result.setPeptide1(fields[6]);
+				result.setPeptide2(fields[10]);
+
+				result.setProteins1(fields[7]);
+				result.setProteins2(fields[11]);
+
 				result.setScanNumber( getScanNumberFromScanField( fields[ 14 ] ) );
-				
-				//result.setScanNumber( Integer.parseInt( fields [ 14 ] ) );
-				
+
 				result.setPosition1String( fields[ 20 ] );
 				result.setPosition2String( fields[ 21 ] );
-				
-				String[] xlinkerFields = fields[ 24 ].split( "#" );
-				MeroxCrosslinker linker = new MeroxCrosslinker();
-				linker.setName( xlinkerFields[ 0 ] );
-				linker.setFormula( xlinkerFields[ 1 ] );
-				result.setLinker( linker );
 				
 				/* to ensure consistency about the order of peptides 1 and 2 for a PSM
 				 * this is required so that a calculated reported peptide string for a result
@@ -177,7 +173,7 @@ public class ResultsReader {
 		return returnedResults;
 		
 	}
-	
+
 	/**
 	 * MeroX can report the scan number in different ways, depending the file format of the scan file. Attempt
 	 * to get the scan number based on ways I've thus far encountered.
@@ -201,8 +197,17 @@ public class ResultsReader {
 			if( scanNumber != null ) { return scanNumber; }
 
 		}
-		
-		
+
+		{
+			String[] fields = scanNumberField.split("~");
+			if(fields.length == 2) {
+				try {
+					return Integer.parseInt( fields[ 0 ] );
+				} catch( Exception e ) {
+					;
+				}
+			}
+		}
 		
 		// check if scan number is reported as this syntax: "Scan 13190 (rt=14.026) [QE_RH_RZtrisnRP_xlink_01.raw]"
 		{

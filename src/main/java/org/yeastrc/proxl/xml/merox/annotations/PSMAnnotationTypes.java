@@ -17,7 +17,7 @@ public class PSMAnnotationTypes {
 	public static final String ANNOTATION_TYPE_DEVIATION = "deviation";
 	public static final String ANNOTATION_TYPE_SCAN_NUMBER = "scan num.";
 	public static final String ANNOTATION_TYPE_RANK = "rank";
-	public static final String ANNOTATION_TYPE_FDR = "FDR";
+	public static final String ANNOTATION_TYPE_Q_VALUE = "qvalue";
 	
 	/**
 	 * Get the list of filterable PSM annotation types in MeroX data
@@ -39,8 +39,8 @@ public class PSMAnnotationTypes {
 
 		{
 			FilterablePsmAnnotationType type = new FilterablePsmAnnotationType();
-			type.setName( ANNOTATION_TYPE_FDR );
-			type.setDescription( "False discovery rate associated with this PSM's score" );
+			type.setName( ANNOTATION_TYPE_Q_VALUE );
+			type.setDescription( "The q-value reported by MeroX" );
 			type.setDefaultFilterValue( new BigDecimal( "0.01" ) );
 			type.setDefaultFilter( true );
 			type.setFilterDirection( FilterDirectionType.BELOW );
@@ -96,14 +96,6 @@ public class PSMAnnotationTypes {
 		{
 			DescriptivePsmAnnotationType type = new DescriptivePsmAnnotationType();
 			type.setName( ANNOTATION_TYPE_DEVIATION );
-			type.setDescription( type.getName() );
-			
-			types.add( type );
-		}
-		
-		{
-			DescriptivePsmAnnotationType type = new DescriptivePsmAnnotationType();
-			type.setName( ANNOTATION_TYPE_SCAN_NUMBER );
 			type.setDescription( type.getName() );
 			
 			types.add( type );

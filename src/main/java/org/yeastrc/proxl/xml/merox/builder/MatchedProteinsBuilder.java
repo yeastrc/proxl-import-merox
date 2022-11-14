@@ -12,6 +12,8 @@ import org.yeastrc.proteomics.fasta.FASTAEntry;
 import org.yeastrc.proteomics.fasta.FASTAFileParser;
 import org.yeastrc.proteomics.fasta.FASTAFileParserFactory;
 import org.yeastrc.proteomics.fasta.FASTAHeader;
+import org.yeastrc.proxl.xml.merox.parsed.ParsedPeptide;
+import org.yeastrc.proxl.xml.merox.utils.IsotopeLabelUtils;
 import org.yeastrc.proxl_import.api.xml_dto.MatchedProteins;
 import org.yeastrc.proxl_import.api.xml_dto.Peptide;
 import org.yeastrc.proxl_import.api.xml_dto.Peptides;
@@ -29,7 +31,6 @@ import org.yeastrc.taxonomy.main.GetTaxonomyId;
  * This is generalized enough to be usable by any pipeline
  * 
  * @author mriffle
- *
  */
 public class MatchedProteinsBuilder {
 
@@ -41,19 +42,16 @@ public class MatchedProteinsBuilder {
 	 * 
 	 * @param proxlInputRoot
 	 * @param fastaFile
-	 * @param decoyIdentifiers
+	 * @param decoyPrefix
 	 * @throws Exception
 	 */
-	public void buildMatchedProteins( ProxlInput proxlInputRoot, File fastaFile, Collection<String> decoyIdentifiers ) throws Exception {
-		
-		// get all distinct peptides found in this search
-		Collection<String> allPetpideSequences = getDistinctPeptides( proxlInputRoot );
-		
+	public void buildMatchedProteins(ProxlInput proxlInputRoot, File fastaFile, String decoyPrefix, Collection<ParsedPeptide> distinctPeptides, String N15prefix ) throws Exception {
+
 		// the proteins we've found
-		Map<String, Collection<FastaProteinAnnotation>> proteins = getProteins( allPetpideSequences, fastaFile, decoyIdentifiers );
+		Map<String, Collection<FastaProteinAnnotation>> proteins = getProteins( distinctPeptides, fastaFile, decoyPrefix );
 		
 		// create the XML and add to root element
-		buildAndAddMatchedProteinsToXML( proxlInputRoot, proteins );
+		buildAndAddMatchedProteinsToXML( proxlInputRoot, proteins, N15prefix );
 		
 	}
 	
@@ -64,7 +62,7 @@ public class MatchedProteinsBuilder {
 	 * @param proteins
 	 * @throws Exception
 	 */
-	private void buildAndAddMatchedProteinsToXML( ProxlInput proxlInputRoot, Map<String, Collection<FastaProteinAnnotation>> proteins ) throws Exception {
+	private void buildAndAddMatchedProteinsToXML( ProxlInput proxlInputRoot, Map<String, Collection<FastaProteinAnnotation>> proteins, String N15prefix ) throws Exception {
 		
 		MatchedProteins xmlMatchedProteins = new MatchedProteins();
 		proxlInputRoot.setMatchedProteins( xmlMatchedProteins );
@@ -89,6 +87,15 @@ public class MatchedProteinsBuilder {
         			
         		if( anno.getTaxonomyId() != null )
         			xmlProteinAnnotation.setNcbiTaxonomyId( new BigInteger( anno.getTaxonomyId().toString() ) );
+
+				if(IsotopeLabelUtils.isLabeldProtein(anno.getName(), N15prefix)) {
+					Protein.ProteinIsotopeLabels xProteinIsotopeLabels = new Protein.ProteinIsotopeLabels();
+					xmlProtein.setProteinIsotopeLabels(xProteinIsotopeLabels);
+
+					Protein.ProteinIsotopeLabels.ProteinIsotopeLabel xProteinIsotopeLabel = new Protein.ProteinIsotopeLabels.ProteinIsotopeLabel();
+					xProteinIsotopeLabel.setLabel("15N");
+					xProteinIsotopeLabels.setProteinIsotopeLabel(xProteinIsotopeLabel);
+				}
         	}
 		}
 	}
@@ -98,13 +105,13 @@ public class MatchedProteinsBuilder {
 	 * Get a map of the distinct target protein sequences mapped to a collection of target annotations for that sequence
 	 * from the given fasta file, where the sequence contains any of the supplied peptide sequences
 	 * 
-	 * @param allPetpideSequences
+	 * @param distinctPeptides
 	 * @param fastaFile
-	 * @param decoyIdentifiers
+	 * @param decoyPrefix
 	 * @return
 	 * @throws Exception
 	 */
-	private Map<String, Collection<FastaProteinAnnotation>> getProteins( Collection<String> allPetpideSequences, File fastaFile, Collection<String> decoyIdentifiers ) throws Exception {
+	private Map<String, Collection<FastaProteinAnnotation>> getProteins( Collection<ParsedPeptide> distinctPeptides, File fastaFile, String decoyPrefix ) throws Exception {
 		
 		Map<String, Collection<FastaProteinAnnotation>> proteinAnnotations = new HashMap<>();
 
@@ -112,7 +119,7 @@ public class MatchedProteinsBuilder {
 
 			for ( FASTAEntry entry = parser.getNextEntry(); entry != null; entry = parser.getNextEntry() ) {
 
-				if( isDecoyFastaEntry( entry, decoyIdentifiers ) )
+				if( isDecoyFastaEntry( entry, decoyPrefix ) )
 					continue;
 				
 				for( FASTAHeader header : entry.getHeaders() ) {
@@ -141,23 +148,18 @@ public class MatchedProteinsBuilder {
 	 * in any of the FASTA names
 	 * 
 	 * @param entry
-	 * @param decoyIdentifiers
+	 * @param decoyPrefix
 	 * @return
 	 */
-	private boolean isDecoyFastaEntry( FASTAEntry entry, Collection<String> decoyIdentifiers ) {
+	private boolean isDecoyFastaEntry( FASTAEntry entry, String decoyPrefix ) {
 
-		for( String decoyId : decoyIdentifiers ) {			
-			for( FASTAHeader header : entry.getHeaders() ) {
+		for( FASTAHeader header : entry.getHeaders() ) {
+			if( header.getName().startsWith( decoyPrefix ) )
+				return true;
 
-				if( header.getName().contains( decoyId ) )
-					return true;
-				
-			}
-			
 		}
-		
+
 		return false;
-		
 	}
 	
 	

@@ -28,7 +28,7 @@ Optional parameters:
 
 	-a <scan number adjustment> -- Adjust the reported scan number by this amount.
 
-	As of this writing, MeroX 3 has a bug in the parsing of mzML files that
+	As of this writing, MeroX 2 has a bug in the parsing of mzML files that
 	causes incorrect scan numbers to be reported. It uses the spectrum index
 	instead of the scan number of the spectrum at that index. This causes
 	a mismatch when the ProXL XML importer attempts to find the referenced

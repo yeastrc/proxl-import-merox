@@ -1,4 +1,4 @@
-Starting up MeroX 3 to proxl XML Converter (version #VERSION#)
+Starting up MeroX 2 to proxl XML Converter (version #VERSION#)
 
 Please report problems by submitting issues on GitHub at:
 https://github.com/yeastrc/proxl-import-MeroX

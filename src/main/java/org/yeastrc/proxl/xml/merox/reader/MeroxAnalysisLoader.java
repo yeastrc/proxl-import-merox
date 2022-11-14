@@ -8,6 +8,8 @@ import java.util.zip.ZipFile;
 
 import org.apache.commons.io.IOUtils;
 import org.yeastrc.proxl.xml.merox.constants.MeroxConstants;
+import org.yeastrc.proxl.xml.merox.objects.MeroxAnalysis;
+import org.yeastrc.proxl.xml.merox.objects.Result;
 
 /**
  * Interact with the zipped MeroX analysis file to load the data
@@ -18,7 +20,7 @@ import org.yeastrc.proxl.xml.merox.constants.MeroxConstants;
  */
 public class MeroxAnalysisLoader {
 
-	public MeroxAnalysis loadMeroXAnalysis(File dataFile ) throws Exception {
+	public MeroxAnalysis loadMeroXAnalysis(File dataFile, String N15prefix) throws Exception {
 		MeroxAnalysis sa = new MeroxAnalysis();
 		
 		ZipFile zipFile = null;	
@@ -32,41 +34,33 @@ public class MeroxAnalysisLoader {
 			// load the properties file
 			ZipEntry zipEntry = zipFile.getEntry( MeroxConstants.PROPERTIES_FILENAME );
 
-			is = zipFile.getInputStream( zipEntry );
-			
-			PropertiesReader pr = new PropertiesReader();
-			AnalysisProperties ap = pr.getAnalysisProperties( is );
+			// save contents of properties file
+			is = zipFile.getInputStream(zipEntry);
+			sa.setPropertiesFileContents(IOUtils.toByteArray(is));
 			is.close();
-			
+
+			PropertiesReader pr = new PropertiesReader();
+			AnalysisProperties ap = pr.getAnalysisProperties(sa.getPropertiesFileContents());
 			sa.setAnalysisProperties( ap );
 
-			// save contents of properties file
-			is = zipFile.getInputStream( zipEntry );
-			sa.setPropertiesFileContents( IOUtils.toByteArray(is)  );
-			
+			// attempt to get the version
+			zipEntry = zipFile.getEntry( MeroxConstants.REPORT_FILENAME );
+			try {
+				sa.setVersion(ReportFileReader.getMeroXVersion(zipFile.getInputStream(zipEntry)));
+			} catch(Exception e) {
+				sa.setVersion("2 (exact version unknown");
+			}
+
 			// load the PSM data
 			zipEntry = zipFile.getEntry( MeroxConstants.PSM_ANNOTATIONS_FILENAME );
 
 			is = zipFile.getInputStream( zipEntry );
 			
 			ResultsReader rr = new ResultsReader();
-			List<Result> analysisResults = rr.getAnalysisResults( is );
+			List<Result> analysisResults = rr.getAnalysisResults( is, N15prefix );
 			is.close();
 			
 			sa.setAnalysisResults( analysisResults );
-			
-			// load the decoy data
-			zipEntry = zipFile.getEntry( MeroxConstants.DECOY_FILENAME );
-			if( zipEntry != null ) {
-				is = zipFile.getInputStream( zipEntry );
-				DecoyHandler handler = new DecoyHandler();
-				handler.readDecoys( is );
-				is.close();
-				
-				sa.setDecoyHandler( handler );
-			} else {
-				throw new Exception( "Decoy file was not found." );
-			}	
 
 			
 		} finally {

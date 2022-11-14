@@ -38,7 +38,7 @@ public class PSMDefaultVisibleAnnotationTypes {
 
 		{
 			SearchAnnotation annotation = new SearchAnnotation();
-			annotation.setAnnotationName( PSMAnnotationTypes.ANNOTATION_TYPE_FDR );
+			annotation.setAnnotationName( PSMAnnotationTypes.ANNOTATION_TYPE_Q_VALUE );
 			annotation.setSearchProgram( MeroxConstants.SEARCH_PROGRAM_NAME );
 			annotations.add( annotation );
 		}

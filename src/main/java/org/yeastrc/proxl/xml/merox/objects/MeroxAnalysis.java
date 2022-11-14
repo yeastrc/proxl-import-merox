@@ -1,8 +1,9 @@
-package org.yeastrc.proxl.xml.merox.reader;
+package org.yeastrc.proxl.xml.merox.objects;
 
 import java.util.List;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.yeastrc.proxl.xml.merox.reader.AnalysisProperties;
 
 /**
  * The data associated with a merox analysis, namely the
@@ -41,16 +42,6 @@ public class MeroxAnalysis {
 	public void setAnalysisResults(List<Result> analysisResults) {
 		this.analysisResults = analysisResults;
 	}
-	
-	public DecoyHandler getDecoyHandler() {
-		return decoyHandler;
-	}
-
-	public void setDecoyHandler(DecoyHandler decoyHandler) {
-		this.decoyHandler = decoyHandler;
-	}
-	
-	
 
 	public byte[] getPropertiesFileContents() {
 		return propertiesFileContents;
@@ -60,11 +51,17 @@ public class MeroxAnalysis {
 		this.propertiesFileContents = propertiesFileContents;
 	}
 
+	public String getVersion() {
+		return version;
+	}
 
+	public void setVersion(String version) {
+		this.version = version;
+	}
 
 	private AnalysisProperties analysisProperties;
 	private List<Result> analysisResults;
-	private DecoyHandler decoyHandler;
 	private byte[] propertiesFileContents;
+	private String version;
 	
 }

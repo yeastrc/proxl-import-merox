@@ -14,9 +14,9 @@ public class NumberUtils {
 	 * @param value
 	 * @return
 	 */
-	public static BigDecimal getRoundedBigDecimal( double value ) {
+	public static BigDecimal getRoundedBigDecimal( double value, int decimalPlaces ) {
 		BigDecimal bd = new BigDecimal( value );
-		bd = bd.setScale( NUMBER_DECIMAL_PLACES, RoundingMode.HALF_UP );
+		bd = bd.setScale( decimalPlaces, RoundingMode.HALF_UP );
 		
 		return bd;
 	}

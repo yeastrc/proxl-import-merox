@@ -1,8 +1,10 @@
 package org.yeastrc.proxl.xml.merox.parsed;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
-import org.yeastrc.proxl.xml.merox.reader.Result;
+import org.yeastrc.proxl.xml.merox.constants.MeroxConstants;
+import org.yeastrc.proxl.xml.merox.objects.Result;
 
 /**
  * In proxl, a "reported peptide" is essentially the string that uniquely identifies
@@ -16,7 +18,21 @@ import org.yeastrc.proxl.xml.merox.reader.Result;
  *
  */
 public class ParsedReportedPeptide {
-	
+
+	public String toString() {
+
+		if( this.getType() == MeroxConstants.PSM_TYPE_MONOLINK ) {
+			return this.getPeptides().get(0).toString();
+		} else if( this.getType() == MeroxConstants.PSM_TYPE_LOOPLINK ) {
+			return this.getPeptides().get(0).toString() + "(" + this.getPeptides().get(0).getLinkedPosition1() + "," + this.getPeptides().get(0).getLinkedPosition2() + ")";
+		} else if( this.getType() == MeroxConstants.PSM_TYPE_CROSSLINK ) {
+			return this.getPeptides().get(0).toString() + "(" + this.getPeptides().get(0).getLinkedPosition1() + ")" + "-" +
+					this.getPeptides().get(1).toString() + "(" + this.getPeptides().get(1).getLinkedPosition1() + ")";
+		}
+
+		return "Error: unknown peptide type";
+	}
+
 	@Override
 	public int hashCode() {
 		return this.getReportedPeptideString().hashCode();
@@ -30,18 +46,15 @@ public class ParsedReportedPeptide {
 		final ParsedReportedPeptide op = (ParsedReportedPeptide)o;
 		return this.getReportedPeptideString().equals( op.getReportedPeptideString() );		
 	}
-	
-	
+
 	public String getReportedPeptideString() {
-		return reportedPeptideString;
+		return this.toString();
 	}
-	public void setReportedPeptideString(String reportedPeptideString) {
-		this.reportedPeptideString = reportedPeptideString;
-	}
-	public Collection<ParsedPeptide> getPeptides() {
+
+	public ArrayList<ParsedPeptide> getPeptides() {
 		return peptides;
 	}
-	public void setPeptides(Collection<ParsedPeptide> peptides) {
+	public void setPeptides(ArrayList<ParsedPeptide> peptides) {
 		this.peptides = peptides;
 	}
 	public Collection<Result> getResults() {
@@ -57,9 +70,7 @@ public class ParsedReportedPeptide {
 		this.type = type;
 	}
 
-
-	private String reportedPeptideString;
-	private Collection<ParsedPeptide> peptides;
+	private ArrayList<ParsedPeptide> peptides;
 	private Collection<Result> results;
 	private int type;
 	

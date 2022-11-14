@@ -11,50 +11,14 @@ import org.yeastrc.proxl.xml.merox.annotations.PSMAnnotationTypes;
 import org.yeastrc.proxl.xml.merox.annotations.PSMDefaultVisibleAnnotationTypes;
 import org.yeastrc.proxl.xml.merox.constants.MeroxConstants;
 import org.yeastrc.proxl.xml.merox.mods.MeroxStaticModification;
+import org.yeastrc.proxl.xml.merox.objects.*;
 import org.yeastrc.proxl.xml.merox.parsed.ParsedPeptide;
 import org.yeastrc.proxl.xml.merox.parsed.ParsedPeptideModification;
 import org.yeastrc.proxl.xml.merox.parsed.ParsedReportedPeptide;
 import org.yeastrc.proxl.xml.merox.parsed.ParsedReportedPeptideUtils;
-import org.yeastrc.proxl.xml.merox.reader.Result;
-import org.yeastrc.proxl.xml.merox.reader.MeroxAnalysis;
 import org.yeastrc.proxl.xml.merox.utils.NumberUtils;
-import org.yeastrc.proxl_import.api.xml_dto.AnnotationCutoffsOnImport;
-import org.yeastrc.proxl_import.api.xml_dto.ConfigurationFile;
-import org.yeastrc.proxl_import.api.xml_dto.ConfigurationFiles;
-import org.yeastrc.proxl_import.api.xml_dto.CrosslinkMass;
-import org.yeastrc.proxl_import.api.xml_dto.CrosslinkMasses;
-import org.yeastrc.proxl_import.api.xml_dto.DecoyLabel;
-import org.yeastrc.proxl_import.api.xml_dto.DecoyLabels;
-import org.yeastrc.proxl_import.api.xml_dto.DefaultVisibleAnnotations;
-import org.yeastrc.proxl_import.api.xml_dto.DescriptivePsmAnnotation;
-import org.yeastrc.proxl_import.api.xml_dto.DescriptivePsmAnnotationTypes;
-import org.yeastrc.proxl_import.api.xml_dto.DescriptivePsmAnnotations;
-import org.yeastrc.proxl_import.api.xml_dto.FilterablePsmAnnotation;
-import org.yeastrc.proxl_import.api.xml_dto.FilterablePsmAnnotationTypes;
-import org.yeastrc.proxl_import.api.xml_dto.FilterablePsmAnnotations;
-import org.yeastrc.proxl_import.api.xml_dto.LinkType;
-import org.yeastrc.proxl_import.api.xml_dto.LinkedPosition;
-import org.yeastrc.proxl_import.api.xml_dto.LinkedPositions;
-import org.yeastrc.proxl_import.api.xml_dto.Linker;
-import org.yeastrc.proxl_import.api.xml_dto.Linkers;
-import org.yeastrc.proxl_import.api.xml_dto.Modification;
-import org.yeastrc.proxl_import.api.xml_dto.Modifications;
-import org.yeastrc.proxl_import.api.xml_dto.Peptide;
-import org.yeastrc.proxl_import.api.xml_dto.Peptides;
-import org.yeastrc.proxl_import.api.xml_dto.ProxlInput;
-import org.yeastrc.proxl_import.api.xml_dto.Psm;
-import org.yeastrc.proxl_import.api.xml_dto.PsmAnnotationCutoffsOnImport;
-import org.yeastrc.proxl_import.api.xml_dto.Psms;
-import org.yeastrc.proxl_import.api.xml_dto.ReportedPeptide;
-import org.yeastrc.proxl_import.api.xml_dto.ReportedPeptides;
-import org.yeastrc.proxl_import.api.xml_dto.SearchAnnotationCutoff;
-import org.yeastrc.proxl_import.api.xml_dto.SearchProgram;
+import org.yeastrc.proxl_import.api.xml_dto.*;
 import org.yeastrc.proxl_import.api.xml_dto.SearchProgram.PsmAnnotationTypes;
-import org.yeastrc.proxl_import.api.xml_dto.SearchProgramInfo;
-import org.yeastrc.proxl_import.api.xml_dto.SearchPrograms;
-import org.yeastrc.proxl_import.api.xml_dto.StaticModification;
-import org.yeastrc.proxl_import.api.xml_dto.StaticModifications;
-import org.yeastrc.proxl_import.api.xml_dto.VisiblePsmAnnotations;
 import org.yeastrc.proxl_import.create_import_file_from_java_objects.main.CreateImportFileFromJavaObjectsMain;
 
 /**
@@ -64,7 +28,7 @@ import org.yeastrc.proxl_import.create_import_file_from_java_objects.main.Create
  */
 public class XMLBuilder {
 
-	public void buildAndSaveXML(MeroxAnalysis analysis, String linkerName, File fastaFile, String scanFilename, int scanNumberAdjustment, File outputFile) throws Exception {
+	public void buildAndSaveXML(MeroxAnalysis analysis, File fastaFile, String scanFilename, File outputFile, String N15prefix) throws Exception {
 		
 		ProxlInput proxlInputRoot = new ProxlInput();
 		proxlInputRoot.setFastaFilename(fastaFile.getName());
@@ -79,7 +43,7 @@ public class XMLBuilder {
 		searchPrograms.getSearchProgram().add( searchProgram );
 		
 		searchProgram.setName( MeroxConstants.SEARCH_PROGRAM_NAME );
-		searchProgram.setVersion( MeroxConstants.SEARCH_PROGRAM_VERSION );
+		searchProgram.setVersion( analysis.getVersion() );
 		searchProgram.setDisplayName( MeroxConstants.SEARCH_PROGRAM_NAME );
 		
 		
@@ -118,20 +82,101 @@ public class XMLBuilder {
 
 		Linker linker = new Linker();
 		linkers.getLinker().add( linker );
-		
-		linker.setName( linkerName );
-		
+
+		MeroxCrosslinker meroxCrosslinker = analysis.getAnalysisProperties().getCrosslinker();
+
+		linker.setName(meroxCrosslinker.getName());
+
+		if(meroxCrosslinker.getSpacerArmLength() != null)
+			linker.setSpacerArmLength(meroxCrosslinker.getSpacerArmLength());
+
+		// add any monolink masses
+		if(meroxCrosslinker.getMonolinkMonoisotopicMasses() != null && meroxCrosslinker.getMonolinkMonoisotopicMasses().size() > 0) {
+			MonolinkMasses xMonolinkMasses = new MonolinkMasses();
+			linker.setMonolinkMasses(xMonolinkMasses);
+
+			for(BigDecimal mass : meroxCrosslinker.getMonolinkMonoisotopicMasses()) {
+				MonolinkMass xMonolinkMass = new MonolinkMass();
+				xMonolinkMass.setMass(mass);
+
+				xMonolinkMasses.getMonolinkMass().add(xMonolinkMass);
+			}
+		}
+
+		// add crosslink mass
 		CrosslinkMasses masses = new CrosslinkMasses();
 		linker.setCrosslinkMasses( masses );
-		
+
 		CrosslinkMass xlinkMass = new CrosslinkMass();
 		linker.getCrosslinkMasses().getCrosslinkMass().add( xlinkMass );
+		xlinkMass.setMass( NumberUtils.getRoundedBigDecimal(meroxCrosslinker.getFullLengthMolecule().getMonoisotopicMass(), 6));
+		xlinkMass.setChemicalFormula(meroxCrosslinker.getFullLengthMolecule().getFormula());
 
-		// set the mass for this crosslinker to the calculated mass for the crosslinker, as defined in the properties file
-		xlinkMass.setMass( NumberUtils.getRoundedBigDecimal( analysis.getAnalysisProperties().getCrosslinker().getMass( analysis.getAnalysisProperties() ) ) );
+		// add any cleavable masses
+		if(meroxCrosslinker.getCleavedMolecules() != null && meroxCrosslinker.getCleavedMolecules().size() > 0) {
+			for(Molecule molecule : meroxCrosslinker.getCleavedMolecules()) {
+				CleavedCrosslinkMass xCleavedCrosslinkMass = new CleavedCrosslinkMass();
+				linker.getCrosslinkMasses().getCleavedCrosslinkMass().add(xCleavedCrosslinkMass);
 
-		
-		
+				xCleavedCrosslinkMass.setMass(NumberUtils.getRoundedBigDecimal(molecule.getMonoisotopicMass(), 6));
+				xCleavedCrosslinkMass.setChemicalFormula(molecule.getFormula());
+			}
+		}
+
+
+		// add linked ends
+		if(meroxCrosslinker.getLinkablePosition1() == null || meroxCrosslinker.getLinkablePosition2() == null) {
+			throw new Exception("Did not get two linkable ends...");
+		}
+
+		LinkedEnds xLinkedEnds = new LinkedEnds();
+		linker.setLinkedEnds(xLinkedEnds);
+
+		for(int endNumber : new int[]{0,1}) {
+			LinkedEnd xLinkedEnd = new LinkedEnd();
+			xLinkedEnds.getLinkedEnd().add(xLinkedEnd);
+
+			LinkablePosition linkablePosition;
+
+			if(endNumber == 1)
+				linkablePosition = meroxCrosslinker.getLinkablePosition1();
+			else
+				linkablePosition = meroxCrosslinker.getLinkablePosition2();
+
+			if(linkablePosition.getResidues() != null && linkablePosition.getResidues().size() > 0) {
+				Residues xResidues = new Residues();
+				xLinkedEnd.setResidues(xResidues);
+
+				for(String residue : linkablePosition.getResidues()) {
+					xResidues.getResidue().add(residue);
+				}
+			}
+
+			if(linkablePosition.isProteinNTerminus() || linkablePosition.isProteinCTerminus()) {
+				ProteinTermini xProteinTermini = new ProteinTermini();
+				xLinkedEnd.setProteinTermini(xProteinTermini);
+
+				if(linkablePosition.isProteinNTerminus()) {
+					ProteinTerminus xProteinTerminus = new ProteinTerminus();
+					xProteinTermini.getProteinTerminus().add(xProteinTerminus);
+					xProteinTerminus.setTerminusEnd(ProteinTerminusDesignation.N);
+					xProteinTerminus.setDistanceFromTerminus(BigInteger.ZERO);
+
+					xProteinTerminus = new ProteinTerminus();
+					xProteinTermini.getProteinTerminus().add(xProteinTerminus);
+					xProteinTerminus.setTerminusEnd(ProteinTerminusDesignation.N);
+					xProteinTerminus.setDistanceFromTerminus(BigInteger.ONE);
+				}
+
+				if(linkablePosition.isProteinCTerminus()) {
+					ProteinTerminus xProteinTerminus = new ProteinTerminus();
+					xProteinTermini.getProteinTerminus().add(xProteinTerminus);
+					xProteinTerminus.setTerminusEnd(ProteinTerminusDesignation.C);
+					xProteinTerminus.setDistanceFromTerminus(BigInteger.ZERO);
+				}
+			}
+		}
+
 		//
 		// Define the static mods
 		//
@@ -148,33 +193,21 @@ public class XMLBuilder {
 				StaticModification xmlSmod = new StaticModification();
 				
 				xmlSmod.setAminoAcid( MeroXSmod.getFrom() );
-				xmlSmod.setMassChange( NumberUtils.getRoundedBigDecimal( MeroXSmod.getMassShift( analysis.getAnalysisProperties() ) ) );			
+				xmlSmod.setMassChange( NumberUtils.getRoundedBigDecimal( MeroXSmod.getMassShift( analysis.getAnalysisProperties()), 6 ) );
 				
 				smods.getStaticModification().add( xmlSmod );
 			}	
 		}
-
-		
 		
 		//
-		// Add decoy labels (optional)
+		// Add decoy labels
 		//
 		DecoyLabels xmlDecoyLabels = new DecoyLabels();
 		proxlInputRoot.setDecoyLabels( xmlDecoyLabels );
-		
-		
-		Collection<String> decoyLabels = new HashSet<>();
-		decoyLabels.add( "random_seq" );
-		decoyLabels.add( "random" );
-		
-		
-		for( String decoyLabel : decoyLabels ) {
-			DecoyLabel xmlDecoyLabel = new DecoyLabel();
-			xmlDecoyLabels.getDecoyLabel().add( xmlDecoyLabel );
-			
-			xmlDecoyLabel.setPrefix( decoyLabel );
-		}
-		
+
+		DecoyLabel xmlDecoyLabel = new DecoyLabel();
+		xmlDecoyLabels.getDecoyLabel().add( xmlDecoyLabel );
+		xmlDecoyLabel.setPrefix(analysis.getAnalysisProperties().getDecoyPrefix());
 		
 		//
 		// Define the peptide and PSM data
@@ -182,7 +215,8 @@ public class XMLBuilder {
 		ReportedPeptides reportedPeptides = new ReportedPeptides();
 		proxlInputRoot.setReportedPeptides( reportedPeptides );
 		
-		Map<String, ParsedReportedPeptide> reportedPeptidesAndResults = ParsedReportedPeptideUtils.getParsedReportedPeptideFromResults( analysis );
+		Map<String, ParsedReportedPeptide> reportedPeptidesAndResults = ParsedReportedPeptideUtils.collateResultsByReportedPeptideString( analysis, N15prefix );
+		Collection<ParsedPeptide> distinctPeptides = new HashSet<>();
 
 		for( String reportedPeptideString : reportedPeptidesAndResults.keySet() ) {
 			
@@ -203,6 +237,9 @@ public class XMLBuilder {
 			
 			// add in the parsed peptides
 			for( ParsedPeptide peptide : reportedPeptidesAndResults.get( reportedPeptideString ).getPeptides() ) {
+
+				distinctPeptides.add(peptide);
+
 				Peptide xmlPeptide = new Peptide();
 				xmlPeptides.getPeptide().add( xmlPeptide );
 				
@@ -217,7 +254,7 @@ public class XMLBuilder {
 						Modification xmlModification = new Modification();
 						xmlModifications.getModification().add( xmlModification );
 						
-						xmlModification.setMass( NumberUtils.getRoundedBigDecimal( mod.getMass() ) );
+						xmlModification.setMass( NumberUtils.getRoundedBigDecimal( mod.getMass(), 6 ) );
 						xmlModification.setPosition( new BigInteger( String.valueOf( mod.getPosition() ) ) );
 						xmlModification.setIsMonolink( mod.isMonolink() );
 					}
@@ -239,6 +276,18 @@ public class XMLBuilder {
 						xmlLinkedPosition.setPosition( new BigInteger( String.valueOf( peptide.getLinkedPosition2() ) ) );
 					}
 				}
+
+				// add in isotope labels
+				if(peptide.isIs15N()) {
+
+					Peptide.PeptideIsotopeLabels xPeptideIsotopeLabels = new Peptide.PeptideIsotopeLabels();
+					xmlPeptide.setPeptideIsotopeLabels(xPeptideIsotopeLabels);
+
+					Peptide.PeptideIsotopeLabels.PeptideIsotopeLabel xPeptideIsotopeLabel = new Peptide.PeptideIsotopeLabels.PeptideIsotopeLabel();
+					xPeptideIsotopeLabel.setLabel("15N");
+					xPeptideIsotopeLabels.setPeptideIsotopeLabel(xPeptideIsotopeLabel);
+				}
+
 			}
 			
 			// add in the PSMs and annotations
@@ -250,14 +299,16 @@ public class XMLBuilder {
 				Psm xmlPsm = new Psm();
 				xmlPsms.getPsm().add( xmlPsm );
 				
-				if( scanFilename != null && scanFilename != "" )
+				if( scanFilename != null && scanFilename.length() > 0 )
 					xmlPsm.setScanFileName( scanFilename );
 				
-				xmlPsm.setScanNumber( new BigInteger( String.valueOf( result.getScanNumber() + scanNumberAdjustment ) ) );
+				xmlPsm.setScanNumber( new BigInteger( String.valueOf( result.getScanNumber() ) ) );
 				xmlPsm.setPrecursorCharge( new BigInteger( String.valueOf( result.getCharge() ) ) );
-				
+				xmlPsm.setPrecursorMZ(NumberUtils.getRoundedBigDecimal(result.getObservedMass(), 6));
+				xmlPsm.setPrecursorRetentionTime(NumberUtils.getRoundedBigDecimal(result.getRetentionTimeSeconds(), 1));
+
 				if( result.getPsmType() != MeroxConstants.PSM_TYPE_MONOLINK )
-					xmlPsm.setLinkerMass( NumberUtils.getRoundedBigDecimal( result.getLinker().getMass( analysis.getAnalysisProperties() ) ) );
+					xmlPsm.setLinkerMass( NumberUtils.getRoundedBigDecimal(analysis.getAnalysisProperties().getCrosslinker().getFullLengthMolecule().getMonoisotopicMass(), 6));
 				
 				// add in the filterable PSM annotations (e.g., score)
 				FilterablePsmAnnotations xmlFilterablePsmAnnotations = new FilterablePsmAnnotations();
@@ -270,7 +321,7 @@ public class XMLBuilder {
 					
 					xmlFilterablePsmAnnotation.setAnnotationName( PSMAnnotationTypes.ANNOTATION_TYPE_SCORE );
 					xmlFilterablePsmAnnotation.setSearchProgram( MeroxConstants.SEARCH_PROGRAM_NAME );
-					xmlFilterablePsmAnnotation.setValue( new BigDecimal( result.getScore() ) );				
+					xmlFilterablePsmAnnotation.setValue( new BigDecimal(result.getScore()));
 				}
 
 				
@@ -284,14 +335,14 @@ public class XMLBuilder {
 					xmlFilterablePsmAnnotation.setValue( new BigDecimal( result.getRank() ) );				
 				}
 				
-				// handle FDR
+				// handle q-value
 				{
 					FilterablePsmAnnotation xmlFilterablePsmAnnotation = new FilterablePsmAnnotation();
 					xmlFilterablePsmAnnotations.getFilterablePsmAnnotation().add( xmlFilterablePsmAnnotation );
 					
-					xmlFilterablePsmAnnotation.setAnnotationName( PSMAnnotationTypes.ANNOTATION_TYPE_FDR );
+					xmlFilterablePsmAnnotation.setAnnotationName( PSMAnnotationTypes.ANNOTATION_TYPE_Q_VALUE );
 					xmlFilterablePsmAnnotation.setSearchProgram( MeroxConstants.SEARCH_PROGRAM_NAME );
-					xmlFilterablePsmAnnotation.setValue( NumberUtils.getRoundedBigDecimal( analysis.getDecoyHandler().getFDR( result.getScore() ) ) );				
+					xmlFilterablePsmAnnotation.setValue(NumberUtils.getRoundedBigDecimal(result.getqValue(), 6));
 				}
 				
 				
@@ -309,7 +360,7 @@ public class XMLBuilder {
 					
 					// try to limit this value to the chosen number of decimal places
 					try {
-						xmlDescriptivePsmAnnotation.setValue( NumberUtils.getRoundedBigDecimal( Double.valueOf( result.getMoverz() ) ).toString() );
+						xmlDescriptivePsmAnnotation.setValue( NumberUtils.getRoundedBigDecimal(result.getMoverz(), 4).toString() );
 					} catch( Exception e ) {
 						xmlDescriptivePsmAnnotation.setValue( String.valueOf( result.getMoverz() ) );
 					}
@@ -325,7 +376,7 @@ public class XMLBuilder {
 					
 					// try to limit this value to the chosen number of decimal places
 					try {
-						xmlDescriptivePsmAnnotation.setValue( NumberUtils.getRoundedBigDecimal( Double.valueOf( result.getObservedMass() ) ).toString() );
+						xmlDescriptivePsmAnnotation.setValue( NumberUtils.getRoundedBigDecimal(result.getObservedMass(), 4).toString() );
 					} catch( Exception e ) {
 						xmlDescriptivePsmAnnotation.setValue( String.valueOf( result.getObservedMass() ) );
 					}
@@ -342,11 +393,11 @@ public class XMLBuilder {
 					
 					// try to limit this value to the chosen number of decimal places
 					try {
-						xmlDescriptivePsmAnnotation.setValue( NumberUtils.getRoundedBigDecimal( Double.valueOf( result.getCandidateMass() ) ).toString() );
+						xmlDescriptivePsmAnnotation.setValue( NumberUtils.getRoundedBigDecimal(result.getCandidateMass(), 4).toString() );
 					} catch( Exception e ) {
 						xmlDescriptivePsmAnnotation.setValue( String.valueOf( result.getCandidateMass() ) );
 					}
-									}
+				}
 				
 				{
 					// handle mass deviation
@@ -358,23 +409,11 @@ public class XMLBuilder {
 					
 					// try to limit this value to the chosen number of decimal places
 					try {
-						xmlDescriptivePsmAnnotation.setValue( NumberUtils.getRoundedBigDecimal( Double.valueOf( result.getDeviation() ) ).toString() );
+						xmlDescriptivePsmAnnotation.setValue( NumberUtils.getRoundedBigDecimal(result.getDeviation(), 4).toString() );
 					} catch( Exception e ) {
 						xmlDescriptivePsmAnnotation.setValue( String.valueOf( result.getDeviation() ) );
 					}
 					
-				}
-
-				{
-					// handle scan number
-					DescriptivePsmAnnotation xmlDescriptivePsmAnnotation = new DescriptivePsmAnnotation();
-					xmlDescriptivePsmAnnotations.getDescriptivePsmAnnotation().add( xmlDescriptivePsmAnnotation );
-					
-					xmlDescriptivePsmAnnotation.setAnnotationName( PSMAnnotationTypes.ANNOTATION_TYPE_SCAN_NUMBER );
-					xmlDescriptivePsmAnnotation.setSearchProgram( MeroxConstants.SEARCH_PROGRAM_NAME );
-					
-					// try to limit this value to the chosen number of decimal places
-					xmlDescriptivePsmAnnotation.setValue( String.valueOf( result.getScanNumber() + scanNumberAdjustment ) );
 				}
 				
 				
@@ -383,7 +422,7 @@ public class XMLBuilder {
 		}
 		
 		// add in matched proteins
-		MatchedProteinsBuilder.getInstance().buildMatchedProteins( proxlInputRoot, fastaFile, decoyLabels );
+		MatchedProteinsBuilder.getInstance().buildMatchedProteins( proxlInputRoot, fastaFile, analysis.getAnalysisProperties().getDecoyPrefix(), distinctPeptides, N15prefix );
 		
 		
 		// add in config file

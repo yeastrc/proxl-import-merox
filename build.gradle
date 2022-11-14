@@ -37,7 +37,7 @@ dependencies {
     compile 'info.picocli:picocli:4.0.0-alpha-1'
     compile 'org.apache.commons:commons-lang3:3.4'
     compile 'commons-io:commons-io:2.6'
-    compile 'org.yeastrc:proxl-import-api:1.9.1'
+    compile 'org.yeastrc:proxl-import-api:1.10.1'
     compile 'org.yeastrc:yrc-fasta-utils:2.0.2'
     compile 'org.yeastrc:yrc-fasta-taxonomy-lookup-utils:1.0.1'
     compile 'org.yeastrc:proteomics-utils:1.0.3'

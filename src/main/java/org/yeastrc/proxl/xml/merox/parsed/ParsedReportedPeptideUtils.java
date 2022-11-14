@@ -4,39 +4,35 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.yeastrc.proxl.xml.merox.reader.MeroxAnalysis;
-import org.yeastrc.proxl.xml.merox.reader.Result;
+import org.yeastrc.proxl.xml.merox.objects.MeroxAnalysis;
+import org.yeastrc.proxl.xml.merox.objects.Result;
 
 public class ParsedReportedPeptideUtils {
 
 	/**
-	 * Convert the results of the analysis (a map of scans to top-scoring PSMs) into a collection of reported peptides
-	 * each with associated PSMs
+	 * Convert a collection of Result objects into a Map keyed on reported peptide string with the value
+	 * being the ParsedReportedPeptide object
 	 * 
 	 * @param analysis
 	 * @return
 	 * @throws Exception
 	 */
-	public static Map<String, ParsedReportedPeptide> getParsedReportedPeptideFromResults( MeroxAnalysis analysis ) throws Exception {
+	public static Map<String, ParsedReportedPeptide> collateResultsByReportedPeptideString(MeroxAnalysis analysis, String N15prefix ) throws Exception {
 		Map<String, ParsedReportedPeptide> peptides = new HashMap<String, ParsedReportedPeptide>();
 		
 		for( Result result : analysis.getAnalysisResults() ) {
-				
-			String reportedPeptideString = result.getReportedPeptideString();
-				
-			ParsedReportedPeptide reportedPeptide = null;
-			if( peptides.containsKey( reportedPeptideString ) ) {
-				reportedPeptide = peptides.get( reportedPeptideString );
+
+			ParsedReportedPeptide reportedPeptide = new ParsedReportedPeptide();
+			ArrayList<ParsedPeptide> parsedPeptides = ParsedPeptideUtils.getParsePeptides(result, analysis.getAnalysisProperties(), N15prefix);
+
+			reportedPeptide.setResults( new ArrayList<>() );
+			reportedPeptide.setType( result.getPsmType() );
+			reportedPeptide.setPeptides(parsedPeptides);
+
+			if( peptides.containsKey( reportedPeptide.getReportedPeptideString() ) ) {
+				reportedPeptide = peptides.get( reportedPeptide.getReportedPeptideString() );
 			} else {
-				reportedPeptide = new ParsedReportedPeptide();
-				peptides.put( reportedPeptideString, reportedPeptide );
-					
-				reportedPeptide.setResults( new ArrayList<Result>() );
-				reportedPeptide.setReportedPeptideString( reportedPeptideString );
-				reportedPeptide.setType( result.getPsmType() );
-					
-				// associated the parsed peptides with this reported peptide
-				reportedPeptide.setPeptides( ParsedPeptideUtils.getParsePeptides( result, analysis.getAnalysisProperties() ) );					
+				peptides.put( reportedPeptide.getReportedPeptideString(), reportedPeptide );
 			}
 				
 			reportedPeptide.getResults().add( result );								

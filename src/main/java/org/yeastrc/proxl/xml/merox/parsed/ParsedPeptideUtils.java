@@ -8,7 +8,8 @@ import java.util.Collection;
 import org.yeastrc.proteomics.peptide.atom.AtomUtils;
 import org.yeastrc.proxl.xml.merox.constants.MeroxConstants;
 import org.yeastrc.proxl.xml.merox.reader.AnalysisProperties;
-import org.yeastrc.proxl.xml.merox.reader.Result;
+import org.yeastrc.proxl.xml.merox.objects.Result;
+import org.yeastrc.proxl.xml.merox.utils.IsotopeLabelUtils;
 import org.yeastrc.proxl.xml.merox.utils.MassUtils;
 
 public class ParsedPeptideUtils {
@@ -21,36 +22,35 @@ public class ParsedPeptideUtils {
 	 * @return
 	 * @throws Exception
 	 */
-	public static Collection<ParsedPeptide> getParsePeptides( Result result, AnalysisProperties properties ) throws Exception {
-		
-		Collection<ParsedPeptide> parsedPeptides = new ArrayList<ParsedPeptide>();
+	public static ArrayList<ParsedPeptide> getParsePeptides(Result result, AnalysisProperties properties, String N15prefix) throws Exception {
+
+		ArrayList<ParsedPeptide> parsedPeptides = new ArrayList<ParsedPeptide>();
 		
 		if( result.getPsmType() == MeroxConstants.PSM_TYPE_CROSSLINK ) {
-			parsedPeptides.add( getCrosslinkedParsedPeptide( result.getPeptide1(), result.getPosition1String(), properties ) );
-			parsedPeptides.add( getCrosslinkedParsedPeptide( result.getPeptide2(), result.getPosition2String(), properties ) );		
+			parsedPeptides.add( getCrosslinkedParsedPeptide( result.getPeptide1(), result.getPosition1String(), result.getProteins1(), properties, N15prefix ) );
+			parsedPeptides.add( getCrosslinkedParsedPeptide( result.getPeptide2(), result.getPosition2String(), result.getProteins2(), properties, N15prefix ) );
 		}
 		
 		else if( result.getPsmType() == MeroxConstants.PSM_TYPE_LOOPLINK ) {
-			parsedPeptides.add( getLooplinkedParsedPeptide( result.getPeptide1(), result.getPosition1String(), result.getPosition2String(), properties ) );
+			parsedPeptides.add( getLooplinkedParsedPeptide( result.getPeptide1(), result.getPosition1String(), result.getPosition2String(), result.getProteins1(), properties, N15prefix ) );
 		}
 		
 		else {
-			parsedPeptides.add( getMonolinkedParsedPeptide( result.getPeptide1(), result.getPosition1String(), result, properties ) );
+			parsedPeptides.add( getMonolinkedParsedPeptide( result, result.getProteins1(), properties, N15prefix ) );
 		}
-		
 		
 		return parsedPeptides;
 	}
 	
 	
-	private static ParsedPeptide getMonolinkedParsedPeptide( String MeroXPeptide, String MeroXPosition, Result result, AnalysisProperties properties ) throws Exception {
+	private static ParsedPeptide getMonolinkedParsedPeptide( Result result, String proteinNames, AnalysisProperties properties, String N15prefix ) throws Exception {
 		String nakedPeptide = "";
 		Collection<ParsedPeptideModification> mods = new ArrayList<ParsedPeptideModification>();
 
 		double staticModTotal = 0.0;	// total static mod mass added
 		
 		// merox peptide all being with either { or [ and end with } or ]. Remove the first and last characters
-		MeroXPeptide = MeroXPeptide.substring(1, MeroXPeptide.length() - 1);
+		String MeroXPeptide = result.getPeptide1().substring(1, result.getPeptide1().length() - 1);
 		
 		
 		for (int i = 0; i < MeroXPeptide.length(); i++){
@@ -85,20 +85,20 @@ public class ParsedPeptideUtils {
 		}
 		
 		// get calculated monoisotopic mass for peptide, including dynamic and static mods
-		double massPreMonolink = MassUtils.calculateNeutralMassOfPeptide( nakedPeptide, mods );		
+		double massPreMonolink = MassUtils.calculateNeutralMassOfPeptide( result.getPeptide1(), mods, properties.getAminoAcids(), properties.getElements() );
 		massPreMonolink += staticModTotal;
 		
 		double MeroXCalculatedMass = result.getCandidateMass();
 
 		// merox reports MH+ mass
-		MeroXCalculatedMass -= AtomUtils.ATOM_HYDROGEN.getMass( org.yeastrc.proteomics.mass.MassUtils.MassType.MONOISOTOPIC );
+		MeroXCalculatedMass -= AtomUtils.ATOM_PROTON.getMass(org.yeastrc.proteomics.mass.MassUtils.MassType.MONOISOTOPIC);
 		
 		double massOfMonolink = MeroXCalculatedMass - massPreMonolink;
 		BigDecimal roundedMassOfMonolink = new BigDecimal( massOfMonolink );
 		roundedMassOfMonolink = roundedMassOfMonolink.setScale( 4, RoundingMode.HALF_UP );
 		
 		// handle the monolinked position as a variable mod
-		MeroXPosition = MeroXPosition.substring( 1 );
+		String MeroXPosition = result.getPosition1String().substring( 1 );
 		int position = Integer.parseInt( MeroXPosition );
 		if( position == 0 ) { position = 1; }
 		
@@ -107,20 +107,22 @@ public class ParsedPeptideUtils {
 		mod.setMass( roundedMassOfMonolink.doubleValue() );
 		mod.setMonolink( true );
 		mod.setPosition( position );
-		
-		
-		
+
 		mods.add( mod );
 				
 		ParsedPeptide peptide = new ParsedPeptide();
-		peptide.setSequence( nakedPeptide );
+		peptide.setSequence( nakedPeptide.toUpperCase() );
 		peptide.setMods( mods );
-		
+
+		if(IsotopeLabelUtils.isLabeldProtein(proteinNames, N15prefix)) {
+			peptide.setIs15N(true);
+		}
+
 		return peptide;
 	}
 	
 	
-	private static ParsedPeptide getLooplinkedParsedPeptide( String MeroXPeptide, String MeroXPosition1, String MeroXPosition2, AnalysisProperties properties ) throws Exception {
+	private static ParsedPeptide getLooplinkedParsedPeptide( String MeroXPeptide, String MeroXPosition1, String MeroXPosition2, String proteinNames, AnalysisProperties properties, String N15prefix ) throws Exception {
 		String nakedPeptide = "";
 		Collection<ParsedPeptideModification> mods = new ArrayList<ParsedPeptideModification>();
 		
@@ -166,15 +168,19 @@ public class ParsedPeptideUtils {
 		if( position2 == 0 ) { position2 = 1; }
 				
 		ParsedPeptide peptide = new ParsedPeptide();
-		peptide.setSequence( nakedPeptide );
+		peptide.setSequence( nakedPeptide.toUpperCase() );
 		peptide.setMods( mods );
 		peptide.setLinkedPosition1( position1 );
 		peptide.setLinkedPosition2( position2 );
-		
+
+		if(IsotopeLabelUtils.isLabeldProtein(proteinNames, N15prefix)) {
+			peptide.setIs15N(true);
+		}
+
 		return peptide;
 	}
 	
-	private static ParsedPeptide getCrosslinkedParsedPeptide( String MeroXPeptide, String MeroXPosition, AnalysisProperties properties ) throws Exception {
+	private static ParsedPeptide getCrosslinkedParsedPeptide( String MeroXPeptide, String MeroXPosition, String proteinNames, AnalysisProperties properties, String N15prefix ) throws Exception {
 		String nakedPeptide = "";
 		Collection<ParsedPeptideModification> mods = new ArrayList<ParsedPeptideModification>();
 		
@@ -217,10 +223,14 @@ public class ParsedPeptideUtils {
 		
 				
 		ParsedPeptide peptide = new ParsedPeptide();
-		peptide.setSequence( nakedPeptide );
+		peptide.setSequence( nakedPeptide.toUpperCase() );
 		peptide.setMods( mods );
 		peptide.setLinkedPosition1( position );
-		
+
+		if(IsotopeLabelUtils.isLabeldProtein(proteinNames, N15prefix)) {
+			peptide.setIs15N(true);
+		}
+
 		return peptide;
 	}
 	

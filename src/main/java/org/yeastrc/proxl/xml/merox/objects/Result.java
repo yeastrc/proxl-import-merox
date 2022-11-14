@@ -1,31 +1,15 @@
-package org.yeastrc.proxl.xml.merox.reader;
+package org.yeastrc.proxl.xml.merox.objects;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.yeastrc.proxl.xml.merox.constants.MeroxConstants;
+import org.yeastrc.proxl.xml.merox.objects.MeroxCrosslinker;
 
 /**
  * A line from the Results.csv file in the zipped merox results file.
  * @author Valued Customer
  *
  */
-public class Result {	
-	
-	/**
-	 * Get a "reported peptide" string that unique identifies the crosslinked
-	 * pair of peptides in this result, including positions linked in those
-	 * peptides and any variable mods in those peptides.
-	 * 
-	 * @return
-	 */
-	public String getReportedPeptideString() {
-		if( this.getPsmType() == MeroxConstants.PSM_TYPE_CROSSLINK )
-			return this.getPeptide1() + "(" + this.getPosition1String() + ")--" + this.getPeptide2() + "(" + this.getPosition2String() + ")";
-		
-		if( this.getPsmType() == MeroxConstants.PSM_TYPE_LOOPLINK )
-			return this.getPeptide1() + "(" + this.getPosition1String() + "," + this.getPosition2String() + ")";
-		
-		return this.getPeptide1() + "(" + this.getPosition1String() + ")";
-	}
+public class Result {
 	
 	/**
 	 * Get the type (crosslink, looplink, or monolink) for this psm. Looked up in
@@ -98,12 +82,6 @@ public class Result {
 	public void setScanNumber(int scanNumber) {
 		this.scanNumber = scanNumber;
 	}
-	public MeroxCrosslinker getLinker() {
-		return linker;
-	}
-	public void setLinker(MeroxCrosslinker linker) {
-		this.linker = linker;
-	}
 	public String getPosition1String() {
 		return position1String;
 	}
@@ -123,7 +101,37 @@ public class Result {
 		this.rank = rank;
 	}
 
+	public int getRetentionTimeSeconds() {
+		return retentionTimeSeconds;
+	}
 
+	public void setRetentionTimeSeconds(int retentionTime) {
+		this.retentionTimeSeconds = retentionTime;
+	}
+
+	public double getqValue() {
+		return qValue;
+	}
+
+	public void setqValue(double qValue) {
+		this.qValue = qValue;
+	}
+
+	public String getProteins1() {
+		return proteins1;
+	}
+
+	public void setProteins1(String proteins1) {
+		this.proteins1 = proteins1;
+	}
+
+	public String getProteins2() {
+		return proteins2;
+	}
+
+	public void setProteins2(String proteins2) {
+		this.proteins2 = proteins2;
+	}
 
 	private int score;
 	private double moverz;
@@ -131,12 +139,15 @@ public class Result {
 	private double observedMass;
 	private double candidateMass;
 	private double deviation;
+	private int retentionTimeSeconds;
 	private String peptide1;
 	private String peptide2;
+	private String proteins1;
+	private String proteins2;
 	private int scanNumber;
 	private String position1String;
 	private String position2String;
-	private MeroxCrosslinker linker;
 	private int rank;
-	
+	private double qValue;
+
 }
