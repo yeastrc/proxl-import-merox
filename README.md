@@ -7,7 +7,7 @@ How To Run
 -------------
 1. Download the [latest release](https://github.com/yeastrc/proxl-import-merox/releases).
 2. Run the program ``java -jar merox2ProxlXML.jar`` with no arguments to see the possible parameters.
-3. Run the program, e.g., ``java -jar ~/jars/merox2ProxlXML.jar -r ./results.zhrm -f ./yeast.fa -o results.xml``
+3. Run the program, e.g., ``java -jar merox2ProxlXML.jar -r ./results.zhrm -f ./yeast.fa -o results.xml``
 
 In the above example, ``results.xml`` will be created and be suitable for import into ProXL.
 
@@ -21,7 +21,7 @@ All entries for 15N labelled proteins would have to begin with "15N_". This "15N
 must be consistent and uniquely identify 15N labelled FASTA protein entries.
 
 Then when running this converter, this "15N" prefix must be passed in using the `--15N-prefix=` parameter. For example:
-``java -jar ~/jars/merox2ProxlXML.jar -r ./results.zhrm -f ./yeast.fa --15N-prefix=15N_ -o results.xml``.
+``java -jar merox2ProxlXML.jar -r ./results.zhrm -f ./yeast.fa --15N-prefix=15N_ -o results.xml``.
 
 More Information About Proxl
 -----------------------------
