@@ -21,7 +21,7 @@ All entries for 15N labelled proteins would have to begin with "15N_". This "15N
 must be consistent and uniquely identify 15N labelled FASTA protein entries.
 
 Then when running this converter, this "15N" prefix must be passed in using the `--15N-prefix=` parameter. For example:
-``java -jar ~/jars/merox2ProxlXML.jar -r ./results.zhrm -f ./yeast.fa --15N-prefix=15N_ -o results.xml -v``.
+``java -jar ~/jars/merox2ProxlXML.jar -r ./results.zhrm -f ./yeast.fa --15N-prefix=15N_ -o results.xml``.
 
 More Information About Proxl
 -----------------------------
