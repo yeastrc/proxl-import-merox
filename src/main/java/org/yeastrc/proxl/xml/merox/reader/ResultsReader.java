@@ -14,6 +14,7 @@ import java.util.regex.Pattern;
 import org.yeastrc.proxl.xml.merox.constants.MeroxConstants;
 import org.yeastrc.proxl.xml.merox.objects.MeroxCrosslinker;
 import org.yeastrc.proxl.xml.merox.objects.Result;
+import org.yeastrc.proxl.xml.merox.utils.DecoyUtils;
 
 /**
  * Read the PSM-level results from Results.csv in the zipped results file
@@ -31,7 +32,7 @@ public class ResultsReader {
 	 * @return
 	 * @throws Exception
 	 */
-	public List<Result> getAnalysisResults(InputStream is, String N15prefix ) throws Exception {
+	public List<Result> getAnalysisResults(InputStream is, AnalysisProperties analysisProperties ) throws Exception {
 		
 		/**
 		 * This map maps scan numbers to a map of scores found for PSMs for that scan that are linked to the results with that score.
@@ -88,6 +89,11 @@ public class ResultsReader {
 
 				result.setPosition1String( fields[ 20 ] );
 				result.setPosition2String( fields[ 21 ] );
+
+				// Skip this result if it's a decoy hit
+				if(DecoyUtils.isDecoyResult(result, analysisProperties)) {
+					continue;
+				}
 				
 				/* to ensure consistency about the order of peptides 1 and 2 for a PSM
 				 * this is required so that a calculated reported peptide string for a result

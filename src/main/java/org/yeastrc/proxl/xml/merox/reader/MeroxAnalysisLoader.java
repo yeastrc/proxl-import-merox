@@ -57,7 +57,7 @@ public class MeroxAnalysisLoader {
 			is = zipFile.getInputStream( zipEntry );
 			
 			ResultsReader rr = new ResultsReader();
-			List<Result> analysisResults = rr.getAnalysisResults( is, N15prefix );
+			List<Result> analysisResults = rr.getAnalysisResults( is, ap );
 			is.close();
 			
 			sa.setAnalysisResults( analysisResults );
