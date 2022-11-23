@@ -304,8 +304,13 @@ public class XMLBuilder {
 				
 				xmlPsm.setScanNumber( new BigInteger( String.valueOf( result.getScanNumber() ) ) );
 				xmlPsm.setPrecursorCharge( new BigInteger( String.valueOf( result.getCharge() ) ) );
-				xmlPsm.setPrecursorMZ(NumberUtils.getRoundedBigDecimal(result.getObservedMass(), 6));
 				xmlPsm.setPrecursorRetentionTime(NumberUtils.getRoundedBigDecimal(result.getRetentionTimeSeconds(), 4));
+
+				try {
+					xmlPsm.setPrecursorMZ(NumberUtils.getRoundedBigDecimal(result.getMoverz(), 6 ));
+				} catch( Exception e ) {
+					xmlPsm.setPrecursorMZ(BigDecimal.valueOf(result.getMoverz()));
+				}
 
 				if( result.getPsmType() != MeroxConstants.PSM_TYPE_MONOLINK )
 					xmlPsm.setLinkerMass( NumberUtils.getRoundedBigDecimal(analysis.getAnalysisProperties().getCrosslinker().getFullLengthMolecule().getMonoisotopicMass(), 6));
