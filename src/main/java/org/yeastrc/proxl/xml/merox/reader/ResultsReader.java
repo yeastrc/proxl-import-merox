@@ -207,11 +207,36 @@ public class ResultsReader {
 		{
 			String[] fields = scanNumberField.split("~");
 			if(fields.length == 2) {
+				// test syntax: 3942~scan_file_prefix
 				try {
 					return Integer.parseInt( fields[ 0 ] );
 				} catch( Exception e ) {
 					;
 				}
+
+				// test syntax (-1) 3824~scan_file_prefix
+				String[] newFields = fields[0].split("\\s+");
+				if(newFields.length == 2) {
+					try {
+						return Integer.parseInt( newFields[ 1 ] );
+					} catch( Exception e ) {
+						;
+					}
+				}
+			}
+		}
+
+		// check if scan number is reported as this syntax: "(-1) 5480~ACE_3837_jb23_38Mmin" where 5480 is scan #
+		{
+			String[] fields = scanNumberField.split( "~" );
+			if( fields.length > 1 && fields[ 0 ].equals( "Scan" ) ) {
+				try {
+					scanNumber = Integer.parseInt( fields[ 1 ] );
+				} catch( Exception e ) {
+					;
+				}
+
+				if( scanNumber != null ) { return scanNumber; }
 			}
 		}
 		
