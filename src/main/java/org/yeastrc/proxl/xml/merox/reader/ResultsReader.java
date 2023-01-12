@@ -12,7 +12,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.yeastrc.proxl.xml.merox.constants.MeroxConstants;
-import org.yeastrc.proxl.xml.merox.objects.MeroxCrosslinker;
 import org.yeastrc.proxl.xml.merox.objects.Result;
 import org.yeastrc.proxl.xml.merox.utils.DecoyUtils;
 
