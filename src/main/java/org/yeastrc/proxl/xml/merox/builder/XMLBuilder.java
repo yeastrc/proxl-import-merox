@@ -28,7 +28,7 @@ import org.yeastrc.proxl_import.create_import_file_from_java_objects.main.Create
  */
 public class XMLBuilder {
 
-	public void buildAndSaveXML(MeroxAnalysis analysis, File fastaFile, String scanFilename, File outputFile, String N15prefix) throws Exception {
+	public void buildAndSaveXML(MeroxAnalysis analysis, File fastaFile, String scanFilename, File outputFile, String N15prefix, int scanNumberAdjust) throws Exception {
 		
 		ProxlInput proxlInputRoot = new ProxlInput();
 		proxlInputRoot.setFastaFilename(fastaFile.getName());
@@ -302,7 +302,7 @@ public class XMLBuilder {
 				if( scanFilename != null && scanFilename.length() > 0 )
 					xmlPsm.setScanFileName( scanFilename );
 				
-				xmlPsm.setScanNumber( new BigInteger( String.valueOf( result.getScanNumber() ) ) );
+				xmlPsm.setScanNumber( new BigInteger( String.valueOf( result.getScanNumber() + scanNumberAdjust ) ) );
 				xmlPsm.setPrecursorCharge( new BigInteger( String.valueOf( result.getCharge() ) ) );
 				xmlPsm.setPrecursorRetentionTime(NumberUtils.getRoundedBigDecimal(result.getRetentionTimeSeconds(), 4));
 

@@ -39,6 +39,9 @@ public class MainProgram implements Runnable {
 	@CommandLine.Option(names = { "-s", "--scan-filename" }, required = false, description = "The name of the scan file (e.g., mydata.mzML) used to search the data. Used to annotate PSMs with the name of the scan file, required if using Bibliospec to create a spectral library for Skyline.")
 	private String scanFilename;
 
+	@CommandLine.Option(names = { "-a", "--scan-number-adjust" }, required = false, description = "(Optional) Adjust the reported scan numbers in the Limelight XML by this amount. E.g. -a -1 would subtract 1 from each scan number.")
+	private int scanNumberAdjust = 0;
+
 	@CommandLine.Option(names = { "--15N-prefix" }, required = false, description = "(Optional) Protein names with this prefix are considered 15N labeled. E.g., 15N_")
 	private String N15prefix;
 
@@ -55,13 +58,13 @@ public class MainProgram implements Runnable {
 	 * 
 	 * @throws Exception If there is a problem
 	 */
-	private void convertData(File resultsFile, File fastaFile, String scanFilename, File outputFile, String N15prefix) throws Exception {
+	private void convertData(File resultsFile, File fastaFile, String scanFilename, File outputFile, String N15prefix, int scanNumberAdjust) throws Exception {
 		
 		MeroxAnalysisLoader loader = new MeroxAnalysisLoader();
 		MeroxAnalysis analysis = loader.loadMeroXAnalysis( resultsFile, N15prefix );
 		
 		XMLBuilder builder = new XMLBuilder();
-		builder.buildAndSaveXML(analysis, fastaFile, scanFilename, outputFile, N15prefix );
+		builder.buildAndSaveXML(analysis, fastaFile, scanFilename, outputFile, N15prefix, scanNumberAdjust );
 		
 	}
 
@@ -83,7 +86,7 @@ public class MainProgram implements Runnable {
 
 		try {
 			MainProgram mp = new MainProgram();
-			mp.convertData(zhrmFile, fastaFile, scanFilename, outFile, N15prefix);
+			mp.convertData(zhrmFile, fastaFile, scanFilename, outFile, N15prefix, scanNumberAdjust);
 
 		} catch(Throwable t) {
 			System.out.println( "\nError encountered:" );
