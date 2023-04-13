@@ -31,8 +31,10 @@ Command line documentation
 ---------------------------
 
 ```
-java -jar merox2ProxlXML.jar [-hvV] [--15N-prefix=<N15prefix>] -f=<fastaFile>
-                             -o=<outFile> -r=<zhrmFile> [-s=<scanFilename>]
+java -jar merox2ProxlXML.jar [-hvV] [--preserve-peptide-order]
+                             [--15N-prefix=<N15prefix>] [-a=<scanNumberAdjust>]
+                             -f=<fastaFile> -o=<outFile> -r=<zhrmFile>
+                             [-s=<scanFilename>]
 
 Description:
 
@@ -53,6 +55,16 @@ Options:
                                search the data. Used to annotate PSMs with the name
                                of the scan file, required if using Bibliospec to
                                create a spectral library for Skyline.
+  -a, --scan-number-adjust=<scanNumberAdjust>
+                             (Optional) Adjust the reported scan numbers in the
+                               Limelight XML by this amount. E.g. -a -1 would
+                               subtract 1 from each scan number.
+      --preserve-peptide-order
+                             If present, the order of peptides reported by MeroX
+                               will be preserved in cross-links. Otherwise the
+                               converter may change the order to ensure all
+                               cross-links are reported using the same peptide
+                               string (e.g. PEPTIDE1--PEPTIDE2.
       --15N-prefix=<N15prefix>
                              (Optional) Protein names with this prefix are
                                considered 15N labeled. E.g., 15N_
