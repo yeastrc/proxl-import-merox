@@ -42,6 +42,9 @@ public class MainProgram implements Runnable {
 	@CommandLine.Option(names = { "-a", "--scan-number-adjust" }, required = false, description = "(Optional) Adjust the reported scan numbers in the Limelight XML by this amount. E.g. -a -1 would subtract 1 from each scan number.")
 	private int scanNumberAdjust = 0;
 
+	@CommandLine.Option(names = { "--preserve-peptide-order" }, required = false, description = "If present, the order of peptides reported by MeroX will be preserved in cross-links. Otherwise the converter may change the order to ensure all cross-links are reported using the same peptide string (e.g. PEPTIDE1--PEPTIDE2.")
+	private boolean preservePeptideOrder = false;
+
 	@CommandLine.Option(names = { "--15N-prefix" }, required = false, description = "(Optional) Protein names with this prefix are considered 15N labeled. E.g., 15N_")
 	private String N15prefix;
 
@@ -58,10 +61,10 @@ public class MainProgram implements Runnable {
 	 * 
 	 * @throws Exception If there is a problem
 	 */
-	private void convertData(File resultsFile, File fastaFile, String scanFilename, File outputFile, String N15prefix, int scanNumberAdjust) throws Exception {
+	private void convertData(File resultsFile, File fastaFile, String scanFilename, File outputFile, String N15prefix, int scanNumberAdjust, boolean preservePeptideOrder) throws Exception {
 		
 		MeroxAnalysisLoader loader = new MeroxAnalysisLoader();
-		MeroxAnalysis analysis = loader.loadMeroXAnalysis( resultsFile, N15prefix );
+		MeroxAnalysis analysis = loader.loadMeroXAnalysis(resultsFile, N15prefix, preservePeptideOrder);
 		
 		XMLBuilder builder = new XMLBuilder();
 		builder.buildAndSaveXML(analysis, fastaFile, scanFilename, outputFile, N15prefix, scanNumberAdjust );
@@ -86,7 +89,7 @@ public class MainProgram implements Runnable {
 
 		try {
 			MainProgram mp = new MainProgram();
-			mp.convertData(zhrmFile, fastaFile, scanFilename, outFile, N15prefix, scanNumberAdjust);
+			mp.convertData(zhrmFile, fastaFile, scanFilename, outFile, N15prefix, scanNumberAdjust, preservePeptideOrder);
 
 		} catch(Throwable t) {
 			System.out.println( "\nError encountered:" );

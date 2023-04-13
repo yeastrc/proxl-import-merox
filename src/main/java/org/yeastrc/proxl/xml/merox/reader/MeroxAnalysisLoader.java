@@ -14,23 +14,23 @@ import org.yeastrc.proxl.xml.merox.objects.Result;
 /**
  * Interact with the zipped MeroX analysis file to load the data
  * from the experiment into a MeroxAnalysis object
- * 
+ *
  * @author mriffle
  *
  */
 public class MeroxAnalysisLoader {
 
-	public MeroxAnalysis loadMeroXAnalysis(File dataFile, String N15prefix) throws Exception {
+	public MeroxAnalysis loadMeroXAnalysis(File dataFile, String N15prefix, boolean preservePeptideOrder) throws Exception {
 		MeroxAnalysis sa = new MeroxAnalysis();
-		
-		ZipFile zipFile = null;	
+
+		ZipFile zipFile = null;
 		InputStream is = null;
-		
+
 		try {
-		
+
 			zipFile = new ZipFile( dataFile.getAbsolutePath() );
 
-			
+
 			// load the properties file
 			ZipEntry zipEntry = zipFile.getEntry( MeroxConstants.PROPERTIES_FILENAME );
 
@@ -55,28 +55,28 @@ public class MeroxAnalysisLoader {
 			zipEntry = zipFile.getEntry( MeroxConstants.PSM_ANNOTATIONS_FILENAME );
 
 			is = zipFile.getInputStream( zipEntry );
-			
+
 			ResultsReader rr = new ResultsReader();
-			List<Result> analysisResults = rr.getAnalysisResults( is, ap );
+			List<Result> analysisResults = rr.getAnalysisResults( is, ap, preservePeptideOrder );
 			is.close();
-			
+
 			sa.setAnalysisResults( analysisResults );
 
-			
+
 		} finally {
 			try { is.close(); }
 			catch( Throwable t ) { ; }
-			
+
 			try { zipFile.close(); }
 			catch( Throwable t ) { ; }
 		}
-		
-		
 
-		
+
+
+
 		return sa;
-		
+
 	}
-	
-	
+
+
 }
