@@ -42,7 +42,7 @@ public class MainProgram implements Runnable {
 	@CommandLine.Option(names = { "-a", "--scan-number-adjust" }, required = false, description = "(Optional) Adjust the reported scan numbers in the Limelight XML by this amount. E.g. -a -1 would subtract 1 from each scan number.")
 	private int scanNumberAdjust = 0;
 
-	@CommandLine.Option(names = { "--preserve-peptide-order" }, required = false, description = "If present, the order of peptides reported by MeroX will be preserved in cross-links. Otherwise the converter may change the order to ensure all cross-links are reported using the same peptide string (e.g. PEPTIDE1--PEPTIDE2.")
+	@CommandLine.Option(names = { "--preserve-peptide-order" }, required = false, description = "(Optional) If present, the order of peptides reported by MeroX will be preserved in cross-links. Otherwise the converter may change the order to ensure all cross-links are reported using the same peptide string (e.g. PEPTIDE1--PEPTIDE2.")
 	private boolean preservePeptideOrder = false;
 
 	@CommandLine.Option(names = { "--15N-prefix" }, required = false, description = "(Optional) Protein names with this prefix are considered 15N labeled. E.g., 15N_")
