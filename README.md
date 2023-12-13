@@ -51,10 +51,9 @@ Options:
                                analysis.
   -o, --out-file=<outFile>   The full path to the desired output proxl XML file.
   -s, --scan-filename=<scanFilename>
-                             The name of the scan file (e.g., mydata.mzML) used to
-                               search the data. Used to annotate PSMs with the name
-                               of the scan file, required if using Bibliospec to
-                               create a spectral library for Skyline.
+                             Set the name of the scan file (e.g., mydata.mzML) used
+                               to search the data. This will override the value
+                               found in the data.
   -a, --scan-number-adjust=<scanNumberAdjust>
                              (Optional) Adjust the reported scan numbers in the
                                Limelight XML by this amount. E.g. -a -1 would
