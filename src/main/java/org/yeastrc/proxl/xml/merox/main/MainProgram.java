@@ -36,7 +36,7 @@ public class MainProgram implements Runnable {
 	@CommandLine.Option(names = { "-o", "--out-file" }, required = true, description = "The full path to the desired output proxl XML file.")
 	private File outFile;
 
-	@CommandLine.Option(names = { "-s", "--scan-filename" }, required = false, description = "The name of the scan file (e.g., mydata.mzML) used to search the data. Used to annotate PSMs with the name of the scan file, required if using Bibliospec to create a spectral library for Skyline.")
+	@CommandLine.Option(names = { "-s", "--scan-filename" }, required = false, description = "Set the name of the scan file (e.g., mydata.mzML) used to search the data. This will override the value found in the data.")
 	private String scanFilename;
 
 	@CommandLine.Option(names = { "-a", "--scan-number-adjust" }, required = false, description = "(Optional) Adjust the reported scan numbers in the Limelight XML by this amount. E.g. -a -1 would subtract 1 from each scan number.")

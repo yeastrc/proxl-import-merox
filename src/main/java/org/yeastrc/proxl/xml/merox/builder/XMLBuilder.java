@@ -299,8 +299,11 @@ public class XMLBuilder {
 				Psm xmlPsm = new Psm();
 				xmlPsms.getPsm().add( xmlPsm );
 				
-				if( scanFilename != null && scanFilename.length() > 0 )
-					xmlPsm.setScanFileName( scanFilename );
+				if( scanFilename != null && scanFilename.length() > 0 ) {
+					xmlPsm.setScanFileName(scanFilename);
+				} else if(result.getScanFilename() != null) {
+					xmlPsm.setScanFileName(result.getScanFilename());
+				}
 				
 				xmlPsm.setScanNumber( new BigInteger( String.valueOf( result.getScanNumber() + scanNumberAdjust ) ) );
 				xmlPsm.setPrecursorCharge( new BigInteger( String.valueOf( result.getCharge() ) ) );

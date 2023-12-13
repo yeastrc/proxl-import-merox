@@ -84,7 +84,8 @@ public class ResultsReader {
 				result.setProteins1(fields[7]);
 				result.setProteins2(fields[11]);
 
-				result.setScanNumber( getScanNumberFromScanField( fields[ 14 ] ) );
+				result.setScanFilename(getScanFilenameFromScanField(fields[14]));
+				result.setScanNumber(getScanNumberFromScanField(fields[ 14 ]));
 
 				result.setPosition1String( fields[ 20 ] );
 				result.setPosition2String( fields[ 21 ] );
@@ -180,6 +181,30 @@ public class ResultsReader {
 		return returnedResults;
 
 	}
+
+	/**
+	 * Get the scan filename from the scan field in the merox results.
+	 * @param scanField
+	 * @return
+	 */
+	private String getScanFilenameFromScanField(String scanField) {
+		Pattern p = Pattern.compile("^File:\\\"(.+)\\\"\\,.+$");
+		Matcher m = p.matcher(scanField);
+
+		if(m.matches()) {
+			String scanFilename = m.group(1);
+
+			// If this ends with .d, assume the Bruker workflow and the scan filename is a mgf file
+			if(scanFilename.endsWith(".d")) {
+				scanFilename = scanFilename.replaceAll("\\.d$", ".mgf");
+			}
+
+			return scanFilename;
+		}
+
+		return null;
+	}
+
 
 	/**
 	 * MeroX can report the scan number in different ways, depending the file format of the scan file. Attempt

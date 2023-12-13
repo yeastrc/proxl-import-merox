@@ -2,7 +2,6 @@ package org.yeastrc.proxl.xml.merox.objects;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.yeastrc.proxl.xml.merox.constants.MeroxConstants;
-import org.yeastrc.proxl.xml.merox.objects.MeroxCrosslinker;
 
 /**
  * A line from the Results.csv file in the zipped merox results file.
@@ -133,6 +132,14 @@ public class Result {
 		this.proteins2 = proteins2;
 	}
 
+	public String getScanFilename() {
+		return scanFilename;
+	}
+
+	public void setScanFilename(String scanFilename) {
+		this.scanFilename = scanFilename;
+	}
+
 	private int score;
 	private double moverz;
 	private int charge;
@@ -149,5 +156,6 @@ public class Result {
 	private String position2String;
 	private int rank;
 	private double qValue;
+	private String scanFilename;
 
 }
