@@ -16,19 +16,19 @@ repositories {
     mavenCentral()
 
     maven {
-        url 'https://raw.github.com/yeastrc/proxl-import-api/repository/'
+        url 'https://raw.githubusercontent.com/yeastrc/proxl-import-api/repository/'
     }
 
     maven {
-        url 'https://raw.github.com/yeastrc/java-fasta-utils/repository/'
+        url 'https://raw.githubusercontent.com/yeastrc/java-fasta-utils/repository/'
     }
 
     maven {
-        url 'https://raw.github.com/yeastrc/fasta-taxonomy-lookup-utils/repository/'
+        url 'https://raw.githubusercontent.com/yeastrc/fasta-taxonomy-lookup-utils/repository/'
     }
 
     maven {
-        url 'https://raw.github.com/yeastrc/proteomics-utils/repository/'
+        url 'https://raw.githubusercontent.com/yeastrc/proteomics-utils/repository/'
     }
 
 }
